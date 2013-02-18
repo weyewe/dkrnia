@@ -1,0 +1,169 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<title><%= COMPANY_NAME %> | <%= COMPANY_MOTO %></title>
+	
+	<meta charset="utf-8">
+	
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,800">
+	
+	
+<!-- 	<link rel="stylesheet" href="css/font-awesome.css">
+	
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/bootstrap-responsive.css">
+
+	<link rel="stylesheet" href="./css/ui-lightness/jquery-ui-1.8.21.custom.css">	
+	
+	<link rel="stylesheet" href="css/application.css">
+	<link rel="stylesheet" href="css/pages/dashboard.css"> -->
+	<%= stylesheet_link_tag 'application'%>
+	<%= yield :additional_css %>
+
+	<%= javascript_include_tag 'modernizr-2.5.3.min' %>
+	<!-- <script src="js/libs/modernizr-2.5.3.min.js"></script> -->
+	<%= csrf_meta_tags %>
+
+</head>
+
+<body>
+	
+<div id="wrapper">
+	
+<div id="topbar">
+	
+	<div class="container">
+		
+		<a href="javascript:;" id="menu-trigger" class="dropdown-toggle" data-toggle="dropdown" data-target="#">
+			<i class="icon-cog"></i>
+		</a>
+	
+		<div id="top-nav">
+			
+			<ul>
+				<!-- <li class="dropdown">
+							<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+								View Your Store				
+								<b class="caret"></b>
+							</a>
+							
+							<ul class="dropdown-menu pull-right">
+								<li><a href="javascript:;">All Store</a></li>
+								<li><a href="javascript:;">Store 1 </a></li>
+								<li><a href="javascript:;">Store 2</a></li> 
+							</ul> 
+						</li> -->
+			</ul>
+			
+			<ul class="pull-right">
+				
+				<li>
+					<%= link_to "REPORT", report_url  , :style => "background-color: rgb(240,240,240);"%>
+				</li>
+				
+				
+				<li><a href="javascript:;"><i class="icon-user"></i> Logged in as <%= current_user.email %></a></li>
+				
+				
+				
+				<li>
+					<%= link_to "Ganti Password", edit_credential_url , :class => "edit_password"%>
+				</li>
+	 
+				<li><%= link_to "Logout", destroy_user_session_url %> </li>
+			</ul>
+			
+		</div> <!-- /#top-nav -->
+		
+	</div> <!-- /.container -->
+	
+</div> <!-- /#topbar -->
+
+
+	
+	
+<div id="header">
+	
+	<div class="container">
+		
+		<!-- <a href="./index.html" class="brand"></a> -->
+		<%= link_to '', root_url, :class => "brand" %>
+		
+		<a href="javascript:;" class="btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        	<i class="icon-reorder"></i>
+      	</a>
+	
+	
+		
+		<div class="nav-collapse">
+			<%= render :partial => "layouts/navigation" %>
+		</div> <!-- /.nav-collapse -->
+
+	</div> <!-- /.container -->
+	
+</div> <!-- /#header -->
+
+
+
+
+	<%= yield %>
+
+
+</div> <!-- /#wrapper -->
+
+
+
+
+<div id="footer">
+		
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="span6">
+				© 2012 <a href="http://weyewe.com">weyewe</a>, all rights reserved.
+			</div> <!-- /span6 -->
+			
+			<div id="builtby" class="span6">
+				<a href="http://weyewe.com">Built by weyewe.</a>				
+			</div> <!-- /.span6 -->
+			
+		</div> <!-- /row -->
+		
+	</div> <!-- /container -->
+	
+</div> <!-- /#footer -->
+
+
+
+<div class="modal fade hide" id="editPassword">
+  <div class="modal-header">
+    <h3>Edit Password</h3>
+  </div>
+  <div class="modal-body"> 
+	<!-- content -->
+  </div>
+  <div class="modal-footer">
+    <!-- <a href="javascript:;" class="btn" data-dismiss="modal">Close</a> -->
+		<a  class="btn modal_closer"  >Close</a>
+  </div>
+</div>
+ 
+
+
+<%= javascript_include_tag "application" %>
+<%= yield :additional_js %>
+
+
+
+</body>
+</html>

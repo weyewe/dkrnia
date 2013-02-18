@@ -1,0 +1,3 @@
+class StockMutation < ActiveRecord::Base
+  # attr_accessible :title, :body
+end
