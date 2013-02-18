@@ -71,8 +71,31 @@ module NavigationHelper
             } 
           ]
         } 
-      ]#,
-      
+      ],#,
+      [
+        {
+          :name => "Item Category",
+          :url  => 'new_item_category_url',
+          :icon => "icon-shopping-cart",
+          :activities => [
+            {
+              :controller => "item_categories",
+              :action     => "new"
+            } 
+          ]
+        },
+        {
+          :name => "Item DB",
+          :url  => 'new_item_url',
+          :icon => "icon-shopping-cart",
+          :activities => [
+            {
+              :controller => "items",
+              :action     => "new"
+            } 
+          ]
+        } 
+      ]
       # # block Service Category
       # [
       #   {

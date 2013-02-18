@@ -1,0 +1,26 @@
+ 
+<tr id="entry-<%= object.id %>">
+	<td>
+		<%= "#{object.name}" %>
+	</td> 
+	
+ 
+
+	<td>
+		 <%= object.active_items.count %>
+	</td>
+	
+	<td>
+		<%= link_to item_category_url(object.id ), :class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
+			<i class='icon-remove'></i>Delete
+		<% end %> 
+	</td>
+
+	<td>
+		<%= link_to edit_item_category_url(object.id), 
+			:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
+			<i class='icon-edit'></i>Edit
+		<% end %>
+	</td>
+	
+</tr>

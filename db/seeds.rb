@@ -31,7 +31,18 @@ Vendor.create({
     :address =>""})
 
 # create item category
-# create item  + item category 
+base_item_category =  ItemCategory.create_base_object( admin, :name => "Base Item" ) 
+
+# create item  
+
+
+test_item  = Item.create_by_employee(  admin,  {
+  :name => "Test Item",
+  :supplier_code => "BEL324234",
+  :customer_code => 'CCCL222',
+  :item_category_id => base_item_category.id 
+})
+
  
 # create stock migration 
 # create purchase  + purchase entry 

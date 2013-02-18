@@ -34,13 +34,33 @@ ActiveRecord::Schema.define(:version => 20130218120313) do
   end
 
   create_table "item_categories", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.string   "name"
+    t.integer  "parent_id"
+    t.integer  "creator_id"
+    t.boolean  "is_base_category", :default => false
+    t.integer  "lft"
+    t.integer  "rgt"
+    t.integer  "depth"
+    t.boolean  "is_deleted",       :default => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
   end
 
   create_table "items", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "creator_id"
+    t.string   "name"
+    t.string   "supplier_code"
+    t.string   "customer_code"
+    t.integer  "item_category_id"
+    t.decimal  "average_cost",              :precision => 11, :scale => 2, :default => 0.0
+    t.decimal  "recommended_selling_price", :precision => 11, :scale => 2, :default => 0.0
+    t.integer  "ready",                                                    :default => 0
+    t.integer  "scrap",                                                    :default => 0
+    t.integer  "pending_delivery",                                         :default => 0
+    t.integer  "on_delivery",                                              :default => 0
+    t.boolean  "is_deleted",                                               :default => false
+    t.datetime "created_at",                                                                  :null => false
+    t.datetime "updated_at",                                                                  :null => false
   end
 
   create_table "roles", :force => true do |t|

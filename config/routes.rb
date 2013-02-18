@@ -16,6 +16,14 @@ Dikarunia::Application.routes.draw do
   resources :app_users
   resources :employees
   resources :vendors 
+  resources :item_categories do 
+    resources :items 
+  end
+  
+  resources :items 
+  resources :items do
+    resources :stock_migrations 
+  end
   
 
 =begin
