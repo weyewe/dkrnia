@@ -43,13 +43,19 @@ $(document).ready(function(){
 	$(".ajax-form").live("submit", function(){
     var $form = $(this);  
     // $form.showLoading();
-
+		var rest_type = "POST"; 
+		
+		if( $form.hasClass("rest_put")){
+			rest_type = "PUT";
+		}
+		
+		
 		$form.spin("large", "black");
 		// $form.spin(false);
 
     $.ajax({
       url: $form.attr("action"),
-      type: "POST",
+      type: rest_type,
       data: $form.serialize(),
       dataType: 'script',
       success: function(response){

@@ -5,12 +5,12 @@ $(document).ready(function(){
 		var yes_value = "Yes"; 
 		var cancel_value = 'false';
 		var $this = $(this); 
+		var action = $this.attr("href");
 		var $row = $this.parents("tr")
 		var entry_id = $row.attr("id").split('-')[1];  
 		var $form = $("#delete_entry_form_wrapper form"); 
 		var $identifier = $(".identifier", $row);
-		
-		var destination = $this.attr("href");
+
 		$.msgbox("Yakin untuk menghapus:" + $identifier.text() +  " ?", {
 		  type: "confirm",
 		  buttons : [
@@ -24,8 +24,8 @@ $(document).ready(function(){
 				$row.spin("large", "black"); 
 
 		    $.ajax({
-		      url: destination,
-		      type: "POST",
+		      url: action,
+		      type: "DELETE",
 		      data: $form.serialize(),
 		      dataType: 'script',
 		      success: function(response){
