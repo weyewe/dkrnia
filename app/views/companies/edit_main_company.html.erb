@@ -1,0 +1,80 @@
+<%= render :partial => "layouts/masthead" ,:locals => {
+	:title => "Store",
+	:description => "Store information"
+}%>
+
+<div id="content">
+
+	<div class="container">
+		
+		
+		<div class="row">
+			
+			<div class="span8">
+ 
+				
+				<%= render :partial => "companies/new_object_form", :locals => {
+					:new_object => @company , 
+					:url => update_company_url(@company)
+				}%>
+ 
+				
+				 
+				
+			</div> <!-- /.span8 -->
+			
+			
+			<div class="span4">
+				
+						
+				<a href="javascript:;" class="btn btn-large btn-primary btn-block btn-big-block">Tree View</a>	
+				
+				
+				<a href="javascript:;" class="btn btn-large btn-tertiary btn-block btn-big-block">Contact Support</a>
+				
+				
+				<div>
+				</div> <!-- /.table wrapper -->
+						
+				
+			</div> <!-- /.span4 -->
+			
+		</div> <!-- /.row -->
+		
+	
+	</div> <!-- /.container -->
+
+</div> <!-- /#content -->
+
+
+<div class="modal fade hide" id="editEntry">
+  <div class="modal-header">
+    <h3>Edit Customer</h3>
+  </div>
+  <div class="modal-body"> 
+	<!-- content -->
+  </div>
+  <div class="modal-footer">
+    <!-- <a href="javascript:;" class="btn" data-dismiss="modal">Close</a> -->
+		<a  class="btn modal_closer"  >Close</a>
+  </div>
+</div>
+
+<div class="modal fade hide" id="newEntry">
+  <div class="modal-header">
+    <h3>New Customer</h3>
+  </div>
+  <div class="modal-body"> 
+	<!-- content -->
+  </div>
+  <div class="modal-footer">
+    <!-- <a href="javascript:;" class="btn" data-dismiss="modal">Close</a> -->
+		<a  class="btn modal_closer"  >Close</a>
+  </div>
+</div>
+ 
+
+
+<% content_for :additional_js do %> 
+	<%= javascript_include_tag "common_order/entry_creation"  	%>
+<% end %>

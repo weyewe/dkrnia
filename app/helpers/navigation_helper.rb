@@ -4,61 +4,7 @@ module NavigationHelper
   
    
   
-  
-  REPORT_NAV = {
-    :header => "Report",
-    :header_icon => "icon-file", 
-    :has_dropdown => true, 
-    :only_icon => false , 
-    :blocks => [
-      # block 1 
-      [
-        {
-          :name => "Progress",
-          :url  => 'root_url',
-          :icon => "icon-tasks",
-          :activities => [
-            {
-              :controller => "home",
-              :action     => "index"
-            },
-            {
-              :controller => "home",
-              :action     => "production_details"
-            },
-            {
-              :controller => "home",
-              :action     => "post_production_details"
-            },
-            {
-              :controller => "home",
-              :action     => "delivery_entry_details"
-            }
-          ]
-        } 
-      ],
-      [
-        {
-          :name => "Hutang",
-          :url  => 'customers_with_outstanding_payment_url',
-          :icon => "icon-tasks",
-          :activities => [
-            {
-              :controller => "home",
-              :action     => "customers_with_outstanding_payment"
-            },
-            {
-              :controller => "home",
-              :action     => "outstanding_payment_details"
-            }
-          ]
-        } 
-      ],
-      
-      
-    ] 
-  }
-  
+   
   
   MANAGEMENT_NAV = {
     :header => "Management",
@@ -106,47 +52,7 @@ module NavigationHelper
     ] 
   }
   
-  
- 
-  
-  PAYMENT_NAV = {
-    :header => "Payment",
-    :header_icon => "icon-shopping-cart",
-    :has_dropdown => true, 
-    :only_icon => false , 
-    :blocks => [
-      # block 1 
-      [
-        {
-          :name => "Invoice",
-          :url  => 'new_invoice_url',
-          :icon => "icon-folder-close",
-          :activities => [
-            {
-              :controller => "invoices",
-              :action     => "new"
-            } 
-          ]
-        },
-        {
-          :name => "Pembayaran",
-          :url  => 'new_payment_url',
-          :icon => "icon-shopping-cart",
-          :activities => [
-            {
-              :controller => "payments",
-              :action     => "new"
-            },
-            {
-              :controller => "invoice_payments",
-              :action     => "new"
-            }
-          ]
-        } 
-      ]
-      
-    ] 
-  }
+   
   
   INVENTORY_NAV = {
     :header => "Inventory",
@@ -258,7 +164,7 @@ module NavigationHelper
     navigation_blocks = [] 
     [ 
       MANAGEMENT_NAV,  
-            INVENTORY_NAV #,
+            # INVENTORY_NAV #,
       #       REPORT_NAV, 
       #       PAYMENT_NAV,
       #       FACTORY_NAV,

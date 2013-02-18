@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130218060819) do
+ActiveRecord::Schema.define(:version => 20130218120313) do
 
   create_table "companies", :force => true do |t|
     t.string   "name"
@@ -22,8 +22,15 @@ ActiveRecord::Schema.define(:version => 20130218060819) do
   end
 
   create_table "employees", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.string   "name"
+    t.string   "phone"
+    t.string   "mobile"
+    t.string   "email"
+    t.string   "bbm_pin"
+    t.text     "address"
+    t.boolean  "is_deleted", :default => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
   end
 
   create_table "item_categories", :force => true do |t|
@@ -83,5 +90,18 @@ ActiveRecord::Schema.define(:version => 20130218060819) do
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
+
+  create_table "vendors", :force => true do |t|
+    t.string   "name"
+    t.string   "contact_person"
+    t.string   "phone"
+    t.string   "mobile"
+    t.string   "email"
+    t.string   "bbm_pin"
+    t.text     "address"
+    t.boolean  "is_deleted",     :default => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
 
 end

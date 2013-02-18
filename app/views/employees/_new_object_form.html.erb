@@ -1,0 +1,49 @@
+<% if new_object.persisted? %>
+	<% id = 'edit_object'%>
+	<% rest_method_class = 'rest_put' %>
+<% else %>
+	<% id = 'new_object'%>
+	<% rest_method_class = 'rest_post' %>
+<% end %>
+
+<%= simple_form_for( new_object, :url => url,
+      :method => :post , 
+      :html => {:class => "form-horizontal prevent_double_submit ajax-form #{rest_method_class}  no_content_form",
+        :id => "#{id}"}) do |f| %>
+
+	 
+
+
+  <%= f.input :name  , :input_html => {:class => "input-xlarge "}, 
+  :label => "Name" %>
+ 
+<hr />
+	<%= f.input :phone  , :input_html => {:class => "input-xlarge "}, 
+  :label => "Telepon" %>
+
+	<%= f.input :mobile  , :input_html => {:class => "input-xlarge "}, 
+  :label => "HP" %>
+
+	<%= f.input :bbm_pin  , :input_html => {:class => "input-xlarge "}, 
+  :label => "BBM" %>
+
+
+	<%= f.input :email  , :input_html => {:class => "input-xlarge "}, 
+  :label => "Email" %>
+ 
+<hr />
+
+	<%= f.input :address  , :input_html => {:class => "input-xlarge ", :rows => 3}, 
+  :label => "Alamat " %>
+
+
+  <div class="form-actions">
+	
+		<% if new_object.persisted? %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update Employee" %>
+		<% else %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Create Employee" %>
+		<% end %>
+		
+  </div>
+<% end %>
