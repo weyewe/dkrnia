@@ -2,7 +2,6 @@ class Vendor < ActiveRecord::Base
   attr_accessible :name, :contact_person, :phone, :mobile , :email, :bbm_pin, :address
   
   validates_presence_of :name 
-  validates_uniqueness_of :name 
   
   validate :unique_non_deleted_name 
   
@@ -12,7 +11,7 @@ class Vendor < ActiveRecord::Base
      # claim.status_changed?
     if not current_object.name.nil? 
       if not current_object.persisted? and current_object.has_duplicate_entry?  
-        errors.add(:name , "Sudah ada vendor di masa lalu  dengan nama sejenis" )  
+        errors.add(:name , "Sudah ada karyawan di masa lalu  dengan nama sejenis" )  
       elsif current_object.persisted? and 
             current_object.name_changed?  and
             current_object.has_duplicate_entry?   
@@ -22,7 +21,7 @@ class Vendor < ActiveRecord::Base
           if current_object.duplicate_entries.count ==1  and 
               current_object.duplicate_entries.first.id == current_object.id 
           else
-            errors.add(:name , "Sudah ada vendor di masa lalu  dengan nama sejenis" )  
+            errors.add(:name , "Sudah ada karyawan di masa lalu  dengan nama sejenis" )  
           end 
       end
     end
@@ -47,7 +46,7 @@ class Vendor < ActiveRecord::Base
     self.where(:is_deleted => false).order("created_at DESC")
   end
   
-  def delete
+  def delete( employee )
     self.is_deleted = true
     self.save
   end

@@ -15,6 +15,7 @@ Dikarunia::Application.routes.draw do
   resources :users
   resources :app_users
   resources :employees
+  resources :vendors 
   
 
 =begin

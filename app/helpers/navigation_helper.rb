@@ -52,6 +52,56 @@ module NavigationHelper
     ] 
   }
   
+  SUPPLY_NAV = {
+    :header => "Supply",
+    :header_icon => "icon-shopping-cart",
+    :has_dropdown => true, 
+    :only_icon => false , 
+    :blocks => [
+      # block 1 
+      [
+        {
+          :name => "Vendor",
+          :url  => 'new_vendor_url',
+          :icon => "icon-folder-close",
+          :activities => [
+            {
+              :controller => "vendors",
+              :action     => "new"
+            } 
+          ]
+        } 
+      ]#,
+      
+      # # block Service Category
+      # [
+      #   {
+      #     :name => "Service Category",
+      #     :url  => 'new_service_category_url',
+      #     :icon => "icon-wrench",
+      #     :activities => [
+      #       {
+      #         :controller => "service_categories",
+      #         :action     => "new"
+      #       } 
+      #     ]
+      #   },
+      #   {
+      #     :name => "Service DB",
+      #     :url  => 'new_service_url',
+      #     :icon => "icon-wrench",
+      #     :activities => [
+      #       {
+      #         :controller => "services",
+      #         :action     => "new"
+      #       } 
+      #     ]
+      #   }
+      # ]
+      
+    ] 
+  }
+  
    
   
   INVENTORY_NAV = {
@@ -164,6 +214,7 @@ module NavigationHelper
     navigation_blocks = [] 
     [ 
       MANAGEMENT_NAV,  
+      SUPPLY_NAV
             # INVENTORY_NAV #,
       #       REPORT_NAV, 
       #       PAYMENT_NAV,
