@@ -20,9 +20,19 @@ admin = User.create_main_user(   :email => "admin@gmail.com" ,:password => "will
 
 admin.set_as_main_user
 
+# create vendor  => OK 
+Vendor.create({
+    :name =>"Monkey Crazy", 
+    :contact_person =>"", 
+    :phone =>"", 
+    :mobile =>"", 
+    :bbm_pin =>"", 
+    :email =>"", 
+    :address =>""})
 
+# create item category
 # create item  + item category 
-# create item category 
+ 
 # create stock migration 
 # create purchase  + purchase entry 
 # create purchase receive + purchase receive entry 
