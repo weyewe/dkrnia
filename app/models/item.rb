@@ -5,6 +5,7 @@ class Item < ActiveRecord::Base
   
   belongs_to :item_category 
   has_one :stock_migration
+  has_many :stock_mutations 
    
   validates_presence_of :name , :item_category_id , :supplier_code, :customer_code
   
@@ -22,7 +23,7 @@ class Item < ActiveRecord::Base
   INITIAL MIGRATION 
 =end 
   def has_past_migration?
-    StockMigration.where(:item_id => self.id ).count > 0 
+    StockMigration.where(:item_id => self.id , :is_confirmed => true ).count > 0 
   end
   
   def self.create_by_employee(  employee, object_params) 
@@ -66,7 +67,21 @@ class Item < ActiveRecord::Base
     end
     self.ready = total_quantity 
     self.save 
+  end
+  
+  def update_ready_quantity 
+    addition = self.stock_mutations.where(
+      :mutation_status  => MUTATION_STATUS[:addition] ,
+      :item_status  => ITEM_STATUS[:ready]
+    ).sum("quantity")
     
+    deduction = self.stock_mutations.where(
+      :mutation_status  => MUTATION_STATUS[:deduction] ,
+      :item_status  => ITEM_STATUS[:ready]
+    ).sum("quantity")
+    
+    self.ready = addition - deduction 
+    self.save 
   end
   
   def delete(current_user)

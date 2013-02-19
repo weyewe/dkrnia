@@ -24,6 +24,11 @@ Dikarunia::Application.routes.draw do
   resources :items do
     resources :stock_migrations 
   end
+  resources :stock_migrations
+  match 'generate_stock_migration'  => 'stock_migrations#generate_stock_migration' , :as => :generate_stock_migration, :method => :post 
+  match 'search_item'  => 'items#search_item' , :as => :search_item
+  
+  
   
 
 =begin

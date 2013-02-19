@@ -73,18 +73,48 @@ ActiveRecord::Schema.define(:version => 20130218120313) do
   end
 
   create_table "stock_entries", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "is_addition",                                         :default => 1
+    t.integer  "creator_id"
+    t.integer  "source_document_id"
+    t.string   "source_document"
+    t.integer  "entry_case"
+    t.integer  "quantity"
+    t.integer  "used_quantity",                                       :default => 0
+    t.integer  "scrapped_quantity",                                   :default => 0
+    t.integer  "item_id"
+    t.boolean  "is_finished",                                         :default => false
+    t.decimal  "base_price_per_piece", :precision => 12, :scale => 2, :default => 0.0
+    t.datetime "created_at",                                                             :null => false
+    t.datetime "updated_at",                                                             :null => false
   end
 
   create_table "stock_migrations", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "item_id"
+    t.string   "code"
+    t.integer  "creator_id"
+    t.integer  "quantity"
+    t.boolean  "is_confirmed", :default => false
+    t.integer  "confirmer_id"
+    t.datetime "confirmed_at"
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
   end
 
   create_table "stock_mutations", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "quantity"
+    t.integer  "scrap_item_id"
+    t.integer  "stock_entry_id"
+    t.integer  "creator_id"
+    t.integer  "source_document_id"
+    t.string   "source_document_entry"
+    t.integer  "source_document_entry_id"
+    t.string   "source_document"
+    t.integer  "mutation_case"
+    t.integer  "mutation_status",          :default => 1
+    t.integer  "item_status",              :default => 1
+    t.integer  "item_id"
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
   end
 
   create_table "users", :force => true do |t|

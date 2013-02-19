@@ -10,10 +10,7 @@ $(document).ready(function(){
 
 	 
 
-	<% if @object.valid? %>
-	 
-		
-		
+	<% if @object.errors.size  == 0  %>
 		// refresh the search  
 		$("#signin_search_item_id").tokenInput("clear");
 		
@@ -29,7 +26,7 @@ $(document).ready(function(){
 		<% migration_summary_table = escape_javascript(  render :partial => "stock_migrations/migration_summary", :locals => {
 	    :item =>  @item,
 			:object => @object ,
-			:stock_migration => @object.stock_migration
+			:stock_migration => @object
 	  }) %>
 		
 		$.msgbox("<%= migration_summary_table  %>", 
@@ -46,7 +43,7 @@ $(document).ready(function(){
 	
 		$form.replaceWith('<%= new_form  %>');
 	
-		$.msgbox("Fail to create adjustment.", 
+		$.msgbox("Gagal menambah stock awal.", 
 					{type: "error"});
 	<% end %>
 	

@@ -1,29 +1,28 @@
 $(document).ready(function(){
-	var $form = $("#stock_migration_trigger_form");  
+
+	var $form = $('#new_object'); 
 	$form.spin(false);
 	
 	
 	
 	<% url  = '' %> 
 	
-	<% if not @new_object.persisted? %>
+	<% if not @object.persisted? %>
 		<% url = stock_migrations_url %> 
 	<% else %>
-		<% url = stock_migration_url(@new_object) %> 
+		<% url = stock_migration_url(@object) %> 
 	<% end %> 
 		<% new_form = escape_javascript(  render :partial => "stock_migrations/new_object_form", :locals => {
-	    :new_object => @new_object , 
+	    :new_object => @object , 
 			:url => url ,
-			:item_id => @item_id 
+			:item_id => @item.id 
 	  })%>
 
 		
 
 
-		if($("#new_object").length != 0 ){ 
-			$("#new_object").replaceWith("<%= new_form %>");
-		}else if( $('#new_object').length == 0 ){ 
-			$("#form_wrapper").append("<%= new_form %>"); 
+		if($("#form_wrapper").length != 0 ){ 
+			$("#form_wrapper").replaceWith("<%= new_form %>");
 		} 
 
 		

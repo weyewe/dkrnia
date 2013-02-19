@@ -6,7 +6,6 @@ class CreateStockMigrations < ActiveRecord::Migration
       t.integer :creator_id 
       
       t.integer :quantity 
-      t.decimal :average_cost ,  :precision => 11, :scale => 2, :default => 0.0
       
       t.boolean :is_confirmed, :default => false 
       t.integer :confirmer_id 

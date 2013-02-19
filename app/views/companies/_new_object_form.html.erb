@@ -18,8 +18,12 @@
 
   <div class="form-actions">
 
-	 
-			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update" %> 
+	 	<% if new_object.persisted? %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update " %>
+		<% else %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Create" %>
+		<% end %>
+		
 
   </div>
 <% end %>

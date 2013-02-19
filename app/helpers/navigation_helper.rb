@@ -94,7 +94,18 @@ module NavigationHelper
               :action     => "new"
             } 
           ]
-        } 
+        },
+        {
+          :name => "Stock Awal",
+          :url  => 'new_stock_migration_url',
+          :icon => "icon-shopping-cart",
+          :activities => [
+            {
+              :controller => "stock_migrations",
+              :action     => "new"
+            } 
+          ]
+        }
       ]
       # # block Service Category
       # [

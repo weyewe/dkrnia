@@ -1,12 +1,14 @@
 <% if new_object.persisted? %>
 	<% id = 'edit_object'%>
+	<% rest_method_class = 'rest_put' %>
 <% else %>
 	<% id = 'new_object'%>
+	<% rest_method_class = 'rest_post' %>
 <% end %>
 
 <%= simple_form_for( new_object, :url => url,
       :method => :post , 
-      :html => {:class => " prevent_double_submit ajax-form   no_content_form",
+      :html => {:class => " prevent_double_submit ajax-form  #{rest_method_class}  no_content_form",
         :id => "#{id}"}) do |f| %>
 
 	 
