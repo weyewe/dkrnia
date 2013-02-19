@@ -6,6 +6,8 @@ class Item < ActiveRecord::Base
   belongs_to :item_category 
   has_one :stock_migration
   has_many :stock_mutations 
+  has_many :purchase_order_entries 
+  has_many :purchase_receival_entries 
    
   validates_presence_of :name , :item_category_id , :supplier_code, :customer_code
   
@@ -121,4 +123,13 @@ class Item < ActiveRecord::Base
     self.save 
   end
   
+=begin
+  UPDATE ITEM STATISTIC
+=end
+  
+  def update_pending_receival
+    self.pending_receival = self.purchase_order_entries.where(:is_confirmed => true ).sum("quantity") - 
+              self.purchase_receival_entries.where(:is_confirmed => true ).sum("quantity")
+    self.save 
+  end
 end

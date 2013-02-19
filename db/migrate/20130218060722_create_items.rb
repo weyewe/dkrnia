@@ -19,6 +19,7 @@ class CreateItems < ActiveRecord::Migration
       t.integer :pending_delivery, :default => 0   # sum of all ordered, not delivered 
       t.integer :on_delivery, :default      => 0  # on the way to customer 
       
+      t.integer :pending_receival 
       
       t.boolean :is_deleted , :default => false
 

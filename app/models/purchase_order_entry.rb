@@ -8,8 +8,17 @@ class PurchaseOrderEntry < ActiveRecord::Base
   validates_presence_of :item_id  
   validates_presence_of :creator_id
   validates_presence_of :quantity  
+  
    
   validate :quantity_must_not_less_than_zero 
+  
+  after_save :update_item_pending_receival
+  after_destroy :update_item_pending_receival 
+  
+  def update_item_pending_receival
+    item = self.item 
+    item.update_pending_receival
+  end
      
   def quantity_must_not_less_than_zero
     if quantity.present? and quantity <= 0 

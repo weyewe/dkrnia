@@ -67,6 +67,7 @@ class PurchaseOrder < ActiveRecord::Base
   def self.create_by_employee( employee, params ) 
     return nil if employee.nil? 
     
+    puts "The employee.id : #{employee.id}"
     new_object = self.new
     new_object.creator_id = employee.id
     new_object.vendor_id = params[:vendor_id]
