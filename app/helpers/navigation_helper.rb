@@ -133,7 +133,23 @@ module NavigationHelper
               :action     => 'new'
             }
           ]
-        } 
+        },
+        {
+          :name => "Penerimaan Pembelian",
+          :url  => 'new_purchase_receival_url',
+          :icon => "icon-shopping-cart",
+          :activities => [
+            {
+              :controller => "purchase_receivals",
+              :action     => "new"
+            },
+            {
+              :controller => "purchase_receival_entries",
+              :action     => 'new'
+            }
+          ]
+        }
+         
       ] 
     ] 
   }

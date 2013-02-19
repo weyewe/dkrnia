@@ -100,10 +100,15 @@ ActiveRecord::Schema.define(:version => 20130219071434) do
 
   create_table "purchase_receivals", :force => true do |t|
     t.integer  "vendor_id"
+    t.integer  "creator_id"
     t.date     "receival_date"
-    t.boolean  "is_confirmed"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.string   "code"
+    t.boolean  "is_confirmed",  :default => false
+    t.integer  "confirmer_id"
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",    :default => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
   end
 
   create_table "roles", :force => true do |t|

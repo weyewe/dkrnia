@@ -20,6 +20,15 @@ admin = User.create_main_user(   :email => "admin@gmail.com" ,:password => "will
 
 admin.set_as_main_user
 
+vendor = Vendor.create({
+    :name =>"Monkey Crazy", 
+    :contact_person =>"", 
+    :phone =>"", 
+    :mobile =>"", 
+    :bbm_pin =>"", 
+    :email =>"", 
+    :address =>""})
+    
 # create vendor  => OK 
 Vendor.create({
     :name =>"Monkey Crazy", 
@@ -54,6 +63,15 @@ test_item_migration =  StockMigration.create_by_employee(admin, {
 # StockAdjustment.create_item_adjustment(admin , test_item , 150 ) 
 
 # create purchase  + purchase entry 
+purchase_order = PurchaseOrder.create_by_employee( @admin, {
+  :vendor_id => vendor.id 
+} )
+
+quantity_purchased  =  6
+purchase_order_entry = PurchaseOrderEntry.create_by_employee( admin, purchase_order, {
+  :item_id => test_item.id ,
+  :quantity => quantity_purchased
+} )
 
 # create purchase receive + purchase receive entry 
 # create delivery  + delivery entry 
