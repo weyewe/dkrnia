@@ -1,0 +1,24 @@
+<table class="table table-bordered table-striped table-highlight" id='tableview'>
+	<thead>
+		<tr>
+			<th>Code</th>
+			<th>Nama</th>
+			<th>Quantity</th>
+			<th colspan='2'>Action</th>
+		</tr>
+	</thead>
+	<tbody> 
+		<!-- because we have the show action -->
+		<% if not defined?(details) %>
+			<% details = 0 %>
+		<% end %>
+		
+		<% objects.each do |object| %>
+			<%= render :partial =>  'purchase_order_entries/entry', :locals => {
+				:object => object ,
+				:parent => parent ,
+				:details => details 
+			} %> 
+		<% end %>
+	</tbody>
+</table>

@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(:version => 20130219071434) do
     t.integer  "scrap",                                                    :default => 0
     t.integer  "pending_delivery",                                         :default => 0
     t.integer  "on_delivery",                                              :default => 0
-    t.integer  "pending_receival"
+    t.integer  "pending_receival",                                         :default => 0
     t.boolean  "is_deleted",                                               :default => false
     t.datetime "created_at",                                                                  :null => false
     t.datetime "updated_at",                                                                  :null => false

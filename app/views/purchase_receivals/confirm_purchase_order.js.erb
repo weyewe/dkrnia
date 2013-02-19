@@ -1,0 +1,57 @@
+$(document).ready(function(){
+	var $form_wrapper = $("#action_button"); 
+	$form_wrapper.spin(false); 
+ 
+
+	<% if  @purchase_receival.is_confirmed?  %>
+	 
+	// replace the actionbar  with postConfirmBar => to delete the sales order 
+		<% post_confirm_bar = escape_javascript(  render :partial => "purchase_receival_entries/purchase_receival/post_confirm_bar", 
+		:locals => {
+	    :parent => @purchase_receival  
+	  })%>
+		
+		$("#actionbar").replaceWith('<%=  post_confirm_bar %>');
+	
+	// refresh the itemList => no edit or delete 
+		<% item_list = escape_javascript(  render :partial => "purchase_receival_entries/purchase_receival/item_list", 
+		:locals => {
+	    :parent => @purchase_receival ,
+			:objects => @purchase_receival.active_purchase_receival_entries 
+	  })%>
+	
+		$("#tableview").replaceWith('<%= item_list %>');
+		
+		// refresh the masthead
+		<% masthead = escape_javascript(  render :partial => "layouts/masthead" ,:locals => {
+			:title => "Purchase Item",
+			:description => "Create New Purchase Item for Purchase Receival <b>#{@purchase_receival.code}</b>".html_safe
+		})%>
+		
+		$("#masthead").replaceWith('<%= masthead%>');
+		
+		
+	
+	// alert msgbox: success confirming 
+		$.msgbox("Berhasil Konfirmasi Purchase Receival: <%= @purchase_receival.code %>", 
+						{type: "info"});
+						 
+		
+		
+	<% else %> 
+		// replace the form, show the edit 
+		<% actionbar = escape_javascript(  render :partial => "purchase_receival_entries/purchase_receival/actionbar", 
+		:locals => {
+	    :parent => @purchase_receival  
+	  })%>
+	
+		$("#actionbar").replaceWith("<%= actionbar %>");
+		 
+		$.msgbox("Error konfirmasi  purchase receival: <%= @purchase_receival.code %>", 
+					{type: "error"});
+	<% end %>
+ 
+	jQuery('.prevent_double_submit').preventDoubleSubmit();
+});
+
+

@@ -1,0 +1,11 @@
+$(document).ready(function(){
+	  
+		<% new_form = escape_javascript(  render :partial => "purchase_order_entries/new_object_form", :locals => {
+	    :new_object => @object , 
+			:url =>  purchase_order_entry_url(@object, :details => params[:details])  
+	  })%>
+ 
+	$("#editEntry .modal-body").append('<%= new_form %>');
+	
+	jQuery('.prevent_double_submit').preventDoubleSubmit();
+});

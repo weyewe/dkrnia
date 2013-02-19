@@ -17,6 +17,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
   
   def update_item_pending_receival
     item = self.item 
+    item.reload 
     item.update_pending_receival
   end
      
@@ -30,10 +31,8 @@ class PurchaseOrderEntry < ActiveRecord::Base
   def delete(employee)
     return nil if employee.nil?
     if self.is_confirmed?  
-      ActiveRecord::Base.transaction do
-        self.post_confirm_delete( employee) 
-      end
-      return self
+      # do something. if it is linked to payment.. we need to do something
+      # if it is not linked.. no need 
     end
     
     self.destroy 
@@ -65,8 +64,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
   
   def update_by_employee( employee, params ) 
     if self.is_confirmed? 
-      self.post_confirm_update(employee,  params ) 
-      return self 
+       # later on, put authorization 
     end
     
     self.quantity           = params[:quantity]       
@@ -78,8 +76,8 @@ class PurchaseOrderEntry < ActiveRecord::Base
   end
   
   
-  def post_confirm_update(employee, params)
-  end
+  # def post_confirm_update(employee, params)
+  # end
   
   
   def generate_code

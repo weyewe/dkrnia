@@ -1,0 +1,34 @@
+ 	<% if not defined?(details)  %>
+		<% details = 0 %>
+	<% end %>
+	
+<tr id="entry-<%= object.id %>">
+	<td>
+		<%= object.code %>
+	</td>
+	<td>
+	 <%= object.item.name %>
+	</td>
+	
+	<td>
+	 <%= object.quantity %>
+	</td>
+	  
+	
+		<td>
+			<%= link_to purchase_order_purchase_order_entry_url(parent.id, object.id ), 
+				:class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
+				<i class='icon-remove'></i>Delete
+			<% end %>
+		</td>
+
+		<td>
+			 
+				<%= link_to edit_purchase_order_purchase_order_entry_url(parent, object, :details => details), 
+					:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
+					<i class='icon-edit'></i>Edit
+				<% end %>
+		 
+		</td>
+	
+</tr>

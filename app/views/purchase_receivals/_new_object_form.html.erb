@@ -1,0 +1,49 @@
+<% if new_object.persisted? %>
+	<% id = 'edit_object'%>
+	<% rest_method_class = 'rest_put' %>
+<% else %>
+	<% id = 'new_object'%>
+	<% rest_method_class = 'rest_post' %>
+<% end %>
+
+<%= simple_form_for( new_object, :url => url,
+      :method => :post , 
+      :html => {:class => " prevent_double_submit ajax-form #{rest_method_class}  no_content_form",
+        :id => "#{id}"}) do |f| %>
+
+	 
+
+
+  <%= f.input :vendor_id  , :input_html => {:class => "input-xlarge "}, 
+  			:label => "Vendor" %>
+ 
+
+  <div class="form-actions">
+	
+		<% if new_object.persisted? %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update Purchase Receival" %>
+		<% else %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Create Purchase Receival" %>
+		<% end %>
+		
+  </div>
+<% end %>
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	 $("#purchase_receival_vendor_id").tokenInput('<%=	search_vendor_url %>', {
+		prePopulate:   	[
+				<% if not new_object.vendor_id.nil? %> 
+				{id: <%= new_object.vendor_id %>, name: '<%= new_object.vendor.name %>'}
+				<% end %>
+			],
+		zindex: 9999,
+		propertyToSearch: "name",
+		tokenLimit: 1
+	});
+});
+</script>

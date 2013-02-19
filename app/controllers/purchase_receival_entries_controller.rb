@@ -1,0 +1,2 @@
+class PurchaseReceivalEntriesController < ApplicationController
+end

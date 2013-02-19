@@ -30,6 +30,11 @@ Dikarunia::Application.routes.draw do
   end
   resources :purchase_order_entries
   
+  resources :purchase_receivals do
+    resources :purchase_receival_entries 
+  end
+  resources :purchase_receival_entries
+  
   match 'search_item'  => 'items#search_item' , :as => :search_item
   match 'search_vendor'  => 'vendors#search_vendor' , :as => :search_vendor
   
@@ -64,5 +69,12 @@ Dikarunia::Application.routes.draw do
 ######### PURCHASE_ORDER 
 ##################################################
 ################################################## 
-  match 'confirm_purchase_order/:purchase_order_id' => "purchase_orders#confirm_purchase_order", :as => :confirm_purchase_order, :method => :post 
+  match 'confirm_purchase_order/:purchase_order_id' => "purchase_orders#confirm_purchase_order", :as => :confirm_purchase_order, :method => :post
+  
+##################################################
+##################################################
+######### PURCHASE_RECEIVAL
+##################################################
+################################################## 
+  match 'confirm_purchase_receival/:purchase_receival_id' => "purchase_receivals#confirm_purchase_receival", :as => :confirm_purchase_receival, :method => :post 
 end
