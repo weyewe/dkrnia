@@ -6,7 +6,7 @@ $(document).ready(function(){
 	<% if  @purchase_order.is_confirmed?  %>
 	 
 	// replace the actionbar  with postConfirmBar => to delete the sales order 
-		<% post_confirm_bar = escape_javascript(  render :partial => "purchase_order_entrys/purchase_order/post_confirm_bar", 
+		<% post_confirm_bar = escape_javascript(  render :partial => "purchase_order_entries/purchase_order/post_confirm_bar", 
 		:locals => {
 	    :parent => @purchase_order  
 	  })%>
@@ -14,10 +14,10 @@ $(document).ready(function(){
 		$("#actionbar").replaceWith('<%=  post_confirm_bar %>');
 	
 	// refresh the itemList => no edit or delete 
-		<% item_list = escape_javascript(  render :partial => "purchase_order_entrys/purchase_order/item_list", 
+		<% item_list = escape_javascript(  render :partial => "purchase_order_entries/purchase_order/item_list", 
 		:locals => {
 	    :parent => @purchase_order ,
-			:objects => @purchase_order.active_purchase_order_entrys 
+			:objects => @purchase_order.active_purchase_order_entries 
 	  })%>
 	
 		$("#tableview").replaceWith('<%= item_list %>');
@@ -40,7 +40,7 @@ $(document).ready(function(){
 		
 	<% else %> 
 		// replace the form, show the edit 
-		<% actionbar = escape_javascript(  render :partial => "purchase_order_entrys/purchase_order/actionbar", 
+		<% actionbar = escape_javascript(  render :partial => "purchase_order_entries/purchase_order/actionbar", 
 		:locals => {
 	    :parent => @purchase_order  
 	  })%>

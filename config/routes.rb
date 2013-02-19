@@ -28,6 +28,7 @@ Dikarunia::Application.routes.draw do
   resources :purchase_orders do
     resources :purchase_order_entries 
   end
+  resources :purchase_order_entries
   
   match 'search_item'  => 'items#search_item' , :as => :search_item
   match 'search_vendor'  => 'vendors#search_vendor' , :as => :search_vendor

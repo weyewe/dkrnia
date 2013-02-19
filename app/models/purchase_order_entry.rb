@@ -45,7 +45,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
     new_object.purchase_order_id = purchase_order.id 
     
     new_object.quantity           = params[:quantity]       
-    new_object.sales_item_id     = params[:item_id]     
+    new_object.item_id     = params[:item_id]     
     
     if new_object.save 
       new_object.generate_code 
@@ -54,14 +54,14 @@ class PurchaseOrderEntry < ActiveRecord::Base
     return new_object 
   end
   
-  def update_sales_item( employee, params ) 
+  def update_by_employee( employee, params ) 
     if self.is_confirmed? 
       self.post_confirm_update(employee,  params ) 
       return self 
     end
     
     self.quantity           = params[:quantity]       
-    self.sales_item_id     = params[:item_id]
+    self.item_id     = params[:item_id]
            
     self.save 
     
