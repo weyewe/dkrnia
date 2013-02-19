@@ -13,10 +13,10 @@ $(document).ready(function(){
 						{type: "error"});
 		<% end %>
 		
-		<% details = escape_javascript( render :partial => "sales_orders/details", 
+		<% details = escape_javascript( render :partial => "purchase_receivals/details", 
 			:locals => {
-		    :parent => @object.sales_order ,
-				:children 		=> @object.sales_order.sales_items.order("created_at DESC")
+		    :parent => @object.purchase_receival ,
+				:children 		=> @object.purchase_receival.purchase_receival_entries.order("created_at DESC")
 	  })%>
 	
 		var $details = $("#details")

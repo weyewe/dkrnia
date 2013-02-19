@@ -17,17 +17,17 @@ $(document).ready(function(){
 		<% if   @has_no_errors  %> 
 			// clean the add product form
 			$form.remove(); 
-			$.msgbox("Berhasil update Purchase Item: <%= @object.code %>", 
+			$.msgbox("Berhasil update Purchase Receival: <%= @object.code %>", 
 						{type: "info"});
 
 			$modal.modal('hide');
 			
 			<% if not params[:details].nil? and params[:details].to_i == 1  %>
 				// re render the shite 
-				<% details = escape_javascript( render :partial => "purchase_orders/details", 
+				<% details = escape_javascript( render :partial => "purchase_receivals/details", 
 					:locals => {
-				    :parent => @object.purchase_order ,
-						:children 		=> @object.purchase_order.purchase_order_entries.order("created_at DESC")
+				    :parent => @object.purchase_receival ,
+						:children 		=> @object.purchase_receival.purchase_receival_entries.order("created_at DESC")
 			  })%>
 
 				var $details = $("#details")
@@ -45,7 +45,7 @@ $(document).ready(function(){
 				$details_dummy.hide();
 				
 			<% else %>
-				<% new_entry  = escape_javascript( render :partial =>  'purchase_order_entries/entry', :locals => {
+				<% new_entry  = escape_javascript( render :partial =>  'purchase_receival_entries/entry', :locals => {
 					:object => @object ,
 					:parent => @parent 
 				} )%>
@@ -59,14 +59,14 @@ $(document).ready(function(){
 
 
 		<% elsif  not @has_no_errors %> 
-			<% new_form = escape_javascript(   render :partial => "purchase_order_entries/new_object_form", :locals => {
+			<% new_form = escape_javascript(   render :partial => "purchase_receival_entries/new_object_form", :locals => {
 		    :new_object => @object , 
-				:url =>  purchase_order_entry_url(@object, :details => params[:details])  
+				:url =>  purchase_receival_entry_url(@object, :details => params[:details])  
 		  })%>
 			//replace the form, show the edit
 			$form.replaceWith("<%= new_form %>"); 
 
-			$.msgbox("Error dalam update purchase item: <%= @object.code %>", 
+			$.msgbox("Error dalam update purchase receival: <%= @object.code %>", 
 						{type: "error"});
 		<% end %>
 

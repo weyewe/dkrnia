@@ -51,13 +51,14 @@ class PurchaseOrderEntriesController < ApplicationController
     @objects = [] 
     query = '%' + search_params + '%'
     # on PostGre SQL, it is ignoring lower case or upper case 
-    @objects = PurchaseOrderEntry.joins(:purchase_order => [:vendor]).where{ (code =~ query)  &
+    @objects = PurchaseOrderEntry.joins(:item  , :purchase_order ).where{ ( item.name =~ query  )  &
                       (is_deleted.eq false) & 
                       (is_confirmed.eq true) }.map do |x| 
                         {
                           :code => x.code, 
+                          :purchase_order_code => x.purchase_order.code,
                           :id => x.id, 
-                          :vendor_name => x.purchase_order.vendor.name 
+                          :item_name => x.item.name
                         }
                       end
     

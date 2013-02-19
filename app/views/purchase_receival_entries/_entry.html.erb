@@ -16,7 +16,7 @@
 	  
 	
 		<td>
-			<%= link_to purchase_order_purchase_order_entry_url(parent.id, object.id ), 
+			<%= link_to purchase_receival_purchase_receival_entry_url(parent.id, object.id ), 
 				:class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
 				<i class='icon-remove'></i>Delete
 			<% end %>
@@ -24,7 +24,7 @@
 
 		<td>
 			 
-				<%= link_to edit_purchase_order_purchase_order_entry_url(parent, object, :details => details), 
+				<%= link_to edit_purchase_receival_purchase_receival_entry_url(parent, object, :details => details), 
 					:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
 					<i class='icon-edit'></i>Edit
 				<% end %>

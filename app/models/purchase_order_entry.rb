@@ -3,6 +3,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
   belongs_to :purchase_order
   belongs_to :item 
   belongs_to :vendor 
+  has_many :purchase_receival_entries 
     
   
   validates_presence_of :item_id  
@@ -116,6 +117,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
     return nil if self.is_confirmed == true 
     self.is_confirmed = true 
     self.save
+    self.generate_code
     self.reload 
   end
   

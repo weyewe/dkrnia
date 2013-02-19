@@ -63,7 +63,7 @@ test_item_migration =  StockMigration.create_by_employee(admin, {
 # StockAdjustment.create_item_adjustment(admin , test_item , 150 ) 
 
 # create purchase  + purchase entry 
-purchase_order = PurchaseOrder.create_by_employee( @admin, {
+purchase_order = PurchaseOrder.create_by_employee( admin, {
   :vendor_id => vendor.id 
 } )
 
@@ -72,6 +72,8 @@ purchase_order_entry = PurchaseOrderEntry.create_by_employee( admin, purchase_or
   :item_id => test_item.id ,
   :quantity => quantity_purchased
 } )
+
+purchase_order.confirm( admin )
 
 # create purchase receive + purchase receive entry 
 # create delivery  + delivery entry 

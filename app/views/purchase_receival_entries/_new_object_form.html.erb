@@ -11,19 +11,22 @@
       :html => {:class => "  prevent_double_submit ajax-form  #{rest_method_class} no_content_form",
         :id => "#{id}"}) do |f| %>
  
-  <%= f.input :item_id, :label =>" Item", :hint => "Pilih item yang akan dipesan"   %>
+  			<%= f.input :purchase_order_entry_id, 
+						:label =>"Pesanan", 
+						:hint => "Pilih pesanan yang diterima"   %>
  
 		
-		<%= f.input :quantity, :label =>"Jumlah", 
-				:hint => "Berapa banyak yang akan dipesan?"   %> 
+				<%= f.input :quantity, 
+						:label =>"Jumlah", 
+						:hint => "Berapa banyak jumlah yang diterima?"   %> 
   
 
   <div class="form-actions">
 	
 		<% if new_object.persisted? %>
-			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update Purchase Order Entry " %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update Purchase Receival Entry " %>
 		<% else %>
-			<%= f.button :submit , :class => "btn btn-primary", :value=> "Create Purchase Order Entry "  %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Create Purchase Receival Entry "  %>
 		<% end %>
 		
   </div>
@@ -32,17 +35,41 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-	
-	 $("#purchase_order_entry_item_id").tokenInput('<%=	search_item_url %>', {
+	 $("#purchase_receival_entry_purchase_order_entry_id").tokenInput('<%=	search_purchase_order_entry_url %>', {
 		prePopulate:   	[
-				<% if not new_object.item_id.nil? %> 
-				{id: <%= new_object.item_id %>, name: '<%= new_object.item.name %>'}
+				<% if not new_object.nil?  and not new_object.purchase_order_entry_id.nil? %> 
+				{	code: '<%= new_object.purchase_order_entry.code %>', 
+					purchase_order_code: '<%= new_object.purchase_order_entry.purchase_order.code %>',
+					id: <%= new_object.purchase_order_entry_id %>,
+					item_name: '<%= new_object.purchase_order_entry.item.name %>'
+				}
 				<% end %>
 			],
 		zindex: 9999,
-		propertyToSearch: "name",
+		propertyToSearch: "item_name",
+		resultsFormatter: function(item){ 
+			var string =  "<li>" + 
+						"<div style='display: inline-block; padding-left: 10px;'>"+ 
+							"<div class='full_name'>" + item.item_name + "</div>"+
+							"<div class='email'>" + item.purchase_order_code + "</div>"+
+						"</div>"+  "</li>" ;
+						
+			return string; 
+		},
+		
+		tokenFormatter: function(item) { 
+			
+			var string =  "<li>" + 
+						"<div style='display: inline-block; padding-left: 10px;'>"+ 
+							"<div class='full_name'>" + item.item_name + "</div>"+
+							"<div class='email'>" + item.purchase_order_code + "</div>"+
+						"</div>"+  "</li>" ;
+						
+			return string;
+		},
 		tokenLimit: 1
 	});
+	
 });
 </script>
 

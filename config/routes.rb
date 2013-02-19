@@ -38,6 +38,7 @@ Dikarunia::Application.routes.draw do
   match 'search_item'  => 'items#search_item' , :as => :search_item
   match 'search_vendor'  => 'vendors#search_vendor' , :as => :search_vendor
   
+  match 'search_purchase_order_entry'  => 'purchase_order_entries#search_purchase_order_entry' , :as => :search_purchase_order_entry
   
   resources :stock_migrations
   match 'generate_stock_migration'  => 'stock_migrations#generate_stock_migration' , :as => :generate_stock_migration, :method => :post 

@@ -1,6 +1,6 @@
 <%= render :partial => "layouts/masthead" ,:locals => {
-	:title => "Purchase Entry",
-	:description => "Create New Purchase Entry for Purchase Order <b>#{@parent.code}</b>".html_safe
+	:title => "Purchase Receival Entry",
+	:description => "Create New Purchase Entry for Purchase Receival <b>#{@parent.code}</b>".html_safe
 }%>
 
 
@@ -16,11 +16,11 @@
 			<div class="span12">
 				
 				<% if @parent.is_confirmed == false %>
-					<%= render :partial => "purchase_order_entries/purchase_order/actionbar", :locals => {
+					<%= render :partial => "purchase_receival_entries/purchase_receival/actionbar", :locals => {
 						:parent => @parent
 					}%>
 				<% else %>
-					<%= render :partial => "purchase_order_entries/purchase_order/post_confirm_bar", :locals => {
+					<%= render :partial => "purchase_receival_entries/purchase_receival/post_confirm_bar", :locals => {
 						:parent => @parent
 					}%>
 				<% end %>
@@ -28,7 +28,7 @@
 				
 				<hr />
 				 
-				 <%= render :partial => 'purchase_order_entries/purchase_order/item_list', :locals => {
+				 <%= render :partial => 'purchase_receival_entries/purchase_receival/item_list', :locals => {
 					:objects => @objects, 
 					:parent => @parent
 				}%>
@@ -55,7 +55,7 @@
 
 <div class="modal fade hide" id="editEntry">
   <div class="modal-header">
-    <h3>Edit Purchase Order Entry</h3>
+    <h3>Edit Purchase Receival Entry</h3>
   </div>
   <div class="modal-body"> 
 	<!-- content -->
@@ -68,7 +68,7 @@
 
 <div class="modal fade hide" id="newEntry">
   <div class="modal-header">
-    <h3>New Purchase Order Entry</h3>
+    <h3>New Purchase Receival Entry</h3>
   </div>
   <div class="modal-body"> 
 	<!-- content -->
@@ -87,7 +87,7 @@
 </div>
 
 <div class="hidden" id="confirm_order">
-  <%= form_for PurchaseOrder.new, :url => confirm_purchase_order_url(@parent)  do |f| %> 
+  <%= form_for PurchaseOrder.new, :url => confirm_purchase_receival_url(@parent)  do |f| %> 
   <% end %>
 </div>
 

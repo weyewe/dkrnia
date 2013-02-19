@@ -47,8 +47,8 @@ class PurchaseReceival < ActiveRecord::Base
    
   
   
-  def active_purchase_order_entries 
-    self.purchase_order_entries.where(:is_deleted => false )
+  def active_purchase_receival_entries 
+    self.purchase_receival_entries.where(:is_deleted => false ).order("created_at DESC")
   end
   
   def update_by_employee( employee, params ) 
@@ -74,7 +74,7 @@ class PurchaseReceival < ActiveRecord::Base
     
     # today_date_time = DateTime.now 
     # 
-    # new_object.order_date   = 
+    # new_object.receival_date   = 
     
     if new_object.save
       new_object.generate_code
@@ -84,9 +84,9 @@ class PurchaseReceival < ActiveRecord::Base
   end
   
   def generate_code
-    # get the total number of sales order created in that month 
+    # get the total number of sales receival created in that month 
     
-    # total_sales_order = SalesOrder.where()
+    # total_sales_receival = SalesOrder.where()
     start_datetime = Date.today.at_beginning_of_month.to_datetime
     end_datetime = Date.today.next_month.at_beginning_of_month.to_datetime
     
@@ -110,7 +110,7 @@ class PurchaseReceival < ActiveRecord::Base
     end
     
     
-    string = "#{header}PO" + "/" + 
+    string = "#{header}PRC" + "/" + 
               self.created_at.year.to_s + '/' + 
               self.created_at.month.to_s + '/' + 
               counter.to_s
@@ -122,17 +122,17 @@ class PurchaseReceival < ActiveRecord::Base
   
   def confirm(employee) 
     return nil if employee.nil? 
-    return nil if self.active_purchase_order_entries.count == 0 
+    return nil if self.active_purchase_receival_entries.count == 0 
     return nil if self.is_confirmed == true  
     
-    # transaction block to confirm all the sales item  + sales order confirmation 
+    # transaction block to confirm all the sales item  + sales receival confirmation 
     ActiveRecord::Base.transaction do
       self.confirmer_id = employee.id 
       self.confirmed_at = DateTime.now 
       self.is_confirmed = true 
       self.save 
       self.generate_code
-      self.purchase_order_entries.each do |po_entry|
+      self.purchase_receival_entries.each do |po_entry|
         po_entry.confirm 
       end
     end 

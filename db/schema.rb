@@ -89,13 +89,17 @@ ActiveRecord::Schema.define(:version => 20130219071434) do
   end
 
   create_table "purchase_receival_entries", :force => true do |t|
+    t.integer  "creator_id"
+    t.string   "code"
     t.integer  "item_id"
     t.integer  "purchase_receival_id"
+    t.integer  "purchase_order_entry_id"
     t.integer  "vendor_id"
     t.integer  "quantity"
-    t.boolean  "is_confirmed",         :default => false
-    t.datetime "created_at",                              :null => false
-    t.datetime "updated_at",                              :null => false
+    t.boolean  "is_confirmed",            :default => false
+    t.boolean  "is_deleted",              :default => false
+    t.datetime "created_at",                                 :null => false
+    t.datetime "updated_at",                                 :null => false
   end
 
   create_table "purchase_receivals", :force => true do |t|
