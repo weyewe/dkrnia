@@ -137,3 +137,9 @@ ITEM_STATUS = {
   :on_delivery => 5  # to the customer. has left the warehouse. but not yet  # do they need this info? no idea
 }
  
+ 
+
+STOCK_ADJUSTMENT_CASE = {
+  :deduction => 1 ,
+  :addition => 2
+}

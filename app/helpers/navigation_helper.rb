@@ -105,34 +105,19 @@ module NavigationHelper
               :action     => "new"
             } 
           ]
+        },
+        {
+          :name => "Stock Adjustment",
+          :url  => 'new_stock_adjustment_url',
+          :icon => "icon-shopping-cart",
+          :activities => [
+            {
+              :controller => "stock_adjustments",
+              :action     => "new"
+            } 
+          ]
         }
-      ]
-      # # block Service Category
-      # [
-      #   {
-      #     :name => "Service Category",
-      #     :url  => 'new_service_category_url',
-      #     :icon => "icon-wrench",
-      #     :activities => [
-      #       {
-      #         :controller => "service_categories",
-      #         :action     => "new"
-      #       } 
-      #     ]
-      #   },
-      #   {
-      #     :name => "Service DB",
-      #     :url  => 'new_service_url',
-      #     :icon => "icon-wrench",
-      #     :activities => [
-      #       {
-      #         :controller => "services",
-      #         :action     => "new"
-      #       } 
-      #     ]
-      #   }
-      # ]
-      
+      ] 
     ] 
   }
   
