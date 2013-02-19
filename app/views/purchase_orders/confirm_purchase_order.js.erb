@@ -1,0 +1,57 @@
+$(document).ready(function(){
+	var $form_wrapper = $("#action_button"); 
+	$form_wrapper.spin(false); 
+ 
+
+	<% if  @purchase_order.is_confirmed?  %>
+	 
+	// replace the actionbar  with postConfirmBar => to delete the sales order 
+		<% post_confirm_bar = escape_javascript(  render :partial => "purchase_order_entrys/purchase_order/post_confirm_bar", 
+		:locals => {
+	    :parent => @purchase_order  
+	  })%>
+		
+		$("#actionbar").replaceWith('<%=  post_confirm_bar %>');
+	
+	// refresh the itemList => no edit or delete 
+		<% item_list = escape_javascript(  render :partial => "purchase_order_entrys/purchase_order/item_list", 
+		:locals => {
+	    :parent => @purchase_order ,
+			:objects => @purchase_order.active_purchase_order_entrys 
+	  })%>
+	
+		$("#tableview").replaceWith('<%= item_list %>');
+		
+		// refresh the masthead
+		<% masthead = escape_javascript(  render :partial => "layouts/masthead" ,:locals => {
+			:title => "Purchase Item",
+			:description => "Create New Purchase Item for Purchase Order <b>#{@purchase_order.code}</b>".html_safe
+		})%>
+		
+		$("#masthead").replaceWith('<%= masthead%>');
+		
+		
+	
+	// alert msgbox: success confirming 
+		$.msgbox("Berhasil Konfirmasi Purchase Order: <%= @purchase_order.code %>", 
+						{type: "info"});
+						 
+		
+		
+	<% else %> 
+		// replace the form, show the edit 
+		<% actionbar = escape_javascript(  render :partial => "purchase_order_entrys/purchase_order/actionbar", 
+		:locals => {
+	    :parent => @purchase_order  
+	  })%>
+	
+		$("#actionbar").replaceWith("<%= actionbar %>");
+		 
+		$.msgbox("Error konfirmasi  sales order: <%= @purchase_order.code %>", 
+					{type: "error"});
+	<% end %>
+ 
+	jQuery('.prevent_double_submit').preventDoubleSubmit();
+});
+
+

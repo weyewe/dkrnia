@@ -117,6 +117,23 @@ module NavigationHelper
             } 
           ]
         }
+      ],
+      [
+        {
+          :name => "Pembelian",
+          :url  => 'new_purchase_order_url',
+          :icon => "icon-shopping-cart",
+          :activities => [
+            {
+              :controller => "purchase_orders",
+              :action     => "new"
+            },
+            {
+              :controller => "purchase_order_entries",
+              :action     => 'new'
+            }
+          ]
+        } 
       ] 
     ] 
   }

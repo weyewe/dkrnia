@@ -1,0 +1,117 @@
+ 	<% if not defined?(details)  %>
+		<% details = 0 %>
+	<% end %>
+	
+<tr id="entry-<%= object.id %>">
+	<td>
+		<%= object.code %>
+	</td>
+	<td>
+		<b><%= object.name %></b><br />
+		<p>
+			<%= object.description %>
+		</p>
+	</td>
+	
+	<td>
+		<ul style='list-style:none;'>
+			<li>
+				Kuantitas Cor : <b><%= object.quantity_for_production %></b>
+			</li>
+			
+			<li>
+				Kuantitas Bubut: <b><%= object.quantity_for_post_production %></b>
+			</li>
+			
+			<li>
+				Berat Satuan: <b><%= object.weight_per_piece %></b> kg
+			</li>
+			
+	 
+		</ul>
+	</td>
+	 
+ 	<td>
+ 		<ul style='list-style:none;'>
+			<li>
+				Pattern:  
+				<% if object.is_pre_production == true %>
+					<span class="label label-primary">YES</span>
+					<%= print_money( object.pre_production_price) if not object.is_pending_pricing? %>
+					<!-- give the price -->
+				<% else %>
+					<span class="label label-tertiary">NO</span>
+				<% end %>
+			</li>
+			
+			<li>
+				Casting: 
+				<% if object.is_production == true %>
+					<span class="label label-primary">YES</span>
+					<%= print_money( object.production_price) if not object.is_pending_pricing? %>
+					
+					<% if object.is_pricing_by_weight? %>	
+						per kg
+					<% else %>
+						per pcs
+					<% end %>
+					<!-- give the price -->
+				<% else %>
+					<span class="label label-tertiary">NO</span>
+				<% end %> 
+			</li>
+			
+			<li>
+				Machining:  
+				<% if object.is_post_production == true %>
+					<span class="label label-primary">YES</span>
+					<%= print_money( object.post_production_price) if not object.is_pending_pricing? %>
+					<!-- give the price -->
+				<% else %>
+					<span class="label label-tertiary">NO</span>
+				<% end %>
+			</li>
+			
+			<li>
+				Delivery:  
+				<% if object.is_delivered == true %>
+					<span class="label label-primary">YES</span>
+				<% else %>
+					<span class="label label-tertiary">NO</span>
+				<% end %>
+			</li>
+			
+			
+			<% if object.is_delivered %>
+			
+				<hr />
+				<%= object.delivery_address %>
+			<% end %>
+		</ul>
+	</td>
+	
+	
+	
+		<td>
+			<%= link_to delete_sales_item_url(:details => details), :class =>"delete_entry", 
+				:style => "cursor:pointer; text-decoration:none;" do %>
+				<i class='icon-remove'></i>Delete
+			<% end %> 
+		</td>
+
+		<td>
+			
+			<% if object.case  == SALES_ITEM_CREATION_CASE[:new]%>
+				<%= link_to edit_sales_order_sales_item_url(parent, object, :details => details), 
+					:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
+					<i class='icon-edit'></i>Edit
+				<% end %>
+			<% else %>
+				<%= link_to edit_sales_order_derivative_sales_item_url(parent, object, :details => details), 
+					:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
+					<i class='icon-edit'></i>Edit
+				<% end %>
+			<% end %> 
+		</td>
+	
+</tr>

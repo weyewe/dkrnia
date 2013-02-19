@@ -45,7 +45,16 @@ test_item  = Item.create_by_employee(  admin,  {
 
  
 # create stock migration 
+test_item_migration =  StockMigration.create_by_employee(admin, {
+  :item_id => test_item.id,
+  :quantity => 200
+})  
+
+# create stock adjustment 
+# StockAdjustment.create_item_adjustment(admin , test_item , 150 ) 
+
 # create purchase  + purchase entry 
+
 # create purchase receive + purchase receive entry 
 # create delivery  + delivery entry 
   # delivery case: inspection or call. Nevertheless, put it in the note field 

@@ -53,6 +53,7 @@ class StockAdjustment < ActiveRecord::Base
       
       physical_to_ready_diff  = physical_quantity  - ready_quantity 
     
+      # puts "physical_to_ready_diff : #{physical_to_ready_diff}"
       if physical_to_ready_diff > 0 
         new_stock_adjustment.adjustment_quantity = physical_to_ready_diff
         new_stock_adjustment.adjustment_case = STOCK_ADJUSTMENT_CASE[:addition]
@@ -62,13 +63,11 @@ class StockAdjustment < ActiveRecord::Base
       elsif adjustment_quantity == 0  
       end
     
-      ActiveRecord::Base.transaction do
-        new_stock_adjustment.save 
-        if not new_stock_adjustment.valid?
-          return new_stock_adjustment
-        end
+         
+      if new_stock_adjustment.save
         StockMutation.create_stock_adjustment(employee,  new_stock_adjustment )
       end
+        
       
       return new_stock_adjustment
     end
