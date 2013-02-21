@@ -9,6 +9,8 @@ class CreatePurchaseOrderEntries < ActiveRecord::Migration
       t.integer :item_id 
 
       t.integer :quantity 
+      
+      t.boolean :is_fulfilled, :default => false 
 
       t.boolean :is_confirmed, :default => false  
 

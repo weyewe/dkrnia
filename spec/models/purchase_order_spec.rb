@@ -88,80 +88,85 @@ describe PurchaseOrder do
       :quantity => 6 
     } ) 
     
+    @purchase_order_entry.errors.messages.each do |msg|
+      puts "Error msg: #{msg}"
+    end
     @purchase_order_entry.should be_valid
   end
-  
-  context "creating purchase order entry, not confirming" do
-    before(:each) do
-      @initial_pending_receival = @test_item.pending_receival
-      @purchase_order = PurchaseOrder.create_by_employee( @admin, {
-        :vendor_id => @vendor.id 
-      } )
-      
-      @quantity_purchased  =  6
-      @purchase_order_entry = PurchaseOrderEntry.create_by_employee( @admin, @purchase_order, {
-        :item_id => @test_item.id ,
-        :quantity => @quantity_purchased
-      } ) 
+    
+   context "creating purchase order entry, not confirming" do
+     before(:each) do
+       @initial_pending_receival = @test_item.pending_receival
+       @purchase_order = PurchaseOrder.create_by_employee( @admin, {
+         :vendor_id => @vendor.id 
+       } )
+       
+       @quantity_purchased  =  6
+       @purchase_order_entry = PurchaseOrderEntry.create_by_employee( @admin, @purchase_order, {
+         :item_id => @test_item.id ,
+         :quantity => @quantity_purchased
+       } ) 
+   
+       @test_item.reload 
+       @final_pending_receival = @test_item.pending_receival
+     end
+     
+     it 'should produce no  diff in pending_receival' do
+       diff = @final_pending_receival - @initial_pending_receival 
+       diff.should == 0 
+     end
+     
+     context "confirming purchase order" do
+       before(:each) do
+         @pre_confirm_pending_receival = @test_item.pending_receival
+         @purchase_order.confirm(@admin)
+         @test_item.reload
+         @post_confirm_pending_receival = @test_item.pending_receival
+       end
+       
+       it 'should confirm purchase order' do
+         @purchase_order.is_confirmed.should be_true 
+       end
+       
+       it 'should change the number of pending_receival' do
+         diff = @post_confirm_pending_receival - @pre_confirm_pending_receival
+         diff.should == @quantity_purchased
+       end
+       
+       context "post confirm update" do
+         before(:each) do
+           @update_quantity = 9
+           @test_item.reload 
+           @pre_update_pending_receival = @test_item.pending_receival
+           @purchase_order_entry.update_by_employee(@admin, {
+             :quantity => @update_quantity,
+             :item_id => @test_item.id 
+           })
+           @test_item.reload 
+         end
+         
+         it 'should alter the item#pending_receival' do
+           @test_item.pending_receival.should == @update_quantity
+         end
+         
+       end
+       
+       context "post confirm delete " do 
+         before(:each) do
+           @update_quantity = 9
+           @test_item.reload 
+           @pre_update_pending_receival = @test_item.pending_receival
+           puts "This is the one deleting\n"*10
+           @purchase_order_entry.delete(@admin )
+           @test_item.reload 
+         end
+         
+         it 'should alter the item#pending_receival' do
+           @test_item.pending_receival.should == 0 
+         end
+       end
+     end
+   end
+ 
 
-      @test_item.reload 
-      @final_pending_receival = @test_item.pending_receival
-    end
-    
-    it 'should produce no  diff in pending_receival' do
-      diff = @final_pending_receival - @initial_pending_receival 
-      diff.should == 0 
-    end
-    
-    context "confirming purchase order" do
-      before(:each) do
-        @pre_confirm_pending_receival = @test_item.pending_receival
-        @purchase_order.confirm(@admin)
-        @test_item.reload
-        @post_confirm_pending_receival = @test_item.pending_receival
-      end
-      
-      it 'should confirm purchase order' do
-        @purchase_order.is_confirmed.should be_true 
-      end
-      
-      it 'should change the number of pending_receival' do
-        diff = @post_confirm_pending_receival - @pre_confirm_pending_receival
-        diff.should == @quantity_purchased
-      end
-      
-      context "post confirm update" do
-        before(:each) do
-          @update_quantity = 9
-          @test_item.reload 
-          @pre_update_pending_receival = @test_item.pending_receival
-          @purchase_order_entry.update_by_employee(@admin, {
-            :quantity => @update_quantity,
-            :item_id => @test_item.id 
-          })
-          @test_item.reload 
-        end
-        
-        it 'should alter the item#pending_receival' do
-          @test_item.pending_receival.should == @update_quantity
-        end
-        
-      end
-      
-      context "post confirm delete " do 
-        before(:each) do
-          @update_quantity = 9
-          @test_item.reload 
-          @pre_update_pending_receival = @test_item.pending_receival
-          puts "This is the one deleting\n"*10
-          @purchase_order_entry.delete(@admin )
-          @test_item.reload 
-        end
-        
-        it 'should alter the item#pending_receival' do
-          @test_item.pending_receival.should == 0 
-        end
-      end
-    end
-  end
 end

@@ -70,6 +70,7 @@ ActiveRecord::Schema.define(:version => 20130219071434) do
     t.string   "code"
     t.integer  "item_id"
     t.integer  "quantity"
+    t.boolean  "is_fulfilled",      :default => false
     t.boolean  "is_confirmed",      :default => false
     t.boolean  "is_deleted",        :default => false
     t.datetime "created_at",                           :null => false

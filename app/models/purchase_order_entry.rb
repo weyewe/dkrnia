@@ -1,3 +1,8 @@
+=begin
+  Pending: if it is possible, don't allow the completed receival to be received 
+  or not even being shown 
+=end
+
 class PurchaseOrderEntry < ActiveRecord::Base
   # attr_accessible :title, :body
   belongs_to :purchase_order
@@ -13,8 +18,20 @@ class PurchaseOrderEntry < ActiveRecord::Base
    
   validate :quantity_must_not_less_than_zero 
   
-  after_save :update_item_pending_receival
+  after_save :update_item_pending_receival, :update_fulfillment_status
   after_destroy :update_item_pending_receival 
+  
+  # this is called when there is change in the purchase_receival_entry#purchase_order_entry
+  # or the purchase_order_entry 's quantity is changed 
+  def update_fulfillment_status
+    if self.is_confirmed? 
+      fulfilled = self.purchase_receival_entries.where(:is_confirmed => true).sum("quantity")
+      if fulfilled >= self.quantity
+        self.is_fulfilled = true 
+        self.save 
+      end
+    end
+  end
   
   def update_item_pending_receival
     item = self.item 
@@ -34,12 +51,19 @@ class PurchaseOrderEntry < ActiveRecord::Base
     if self.is_confirmed?  
       # do something. if it is linked to payment.. we need to do something
       # if it is not linked.. no need 
+      self.post_confirm_delete( employee )  
+      return self
     end
     
     self.destroy 
   end
   
   def post_confirm_delete( employee)  
+    # if there has been receival, can't be destroyed. 
+    if self.purchase_receival_entries.where(:is_deleted => false).count != 0 
+      
+      return self
+    end
     self.destroy 
   end
   
@@ -119,6 +143,10 @@ class PurchaseOrderEntry < ActiveRecord::Base
     self.save
     self.generate_code
     self.reload 
+  end
+  
+  def received_quantity 
+    self.purchase_receival_entries.where(:is_confirmed => true).sum('quantity')
   end
   
 end

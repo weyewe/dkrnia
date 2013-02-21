@@ -10,23 +10,67 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   validates_presence_of :creator_id
   validates_presence_of :quantity  
   validates_presence_of :purchase_order_entry_id 
+  has_many :purchase_receival_entries
   
    
   validate :quantity_must_not_less_than_zero 
+  validate :quantity_must_not_exceed_the_ordered_quantity
+  validate :unique_purchase_order_entry 
   
-  after_save :update_item_pending_receival
-  after_destroy :update_item_pending_receival 
+  after_save :update_item_pending_receival, :update_purchase_order_entry_fulfilment_status
+  after_destroy :update_item_pending_receival , :update_purchase_order_entry_fulfilment_status
   
   def update_item_pending_receival
     item = self.item 
     item.reload 
     item.update_pending_receival
   end
+  
+  def update_purchase_order_entry_fulfilment_status
+    purchase_order_entry = self.purchase_order_entry 
+    purchase_order_entry.update_fulfillment_status
+    # what if they change the purchase_order_entry
+  end
      
   def quantity_must_not_less_than_zero
     if quantity.present? and quantity <= 0 
       msg = "Kuantitas  tidak boleh 0 atau negative "
       errors.add(:quantity_for_production , msg )
+    end
+  end
+     
+  def quantity_must_not_exceed_the_ordered_quantity
+    return nil if self.purchase_order_entry.nil? 
+    return nil if self.is_confirmed? 
+    
+    purchase_order_entry = self.purchase_order_entry 
+    received_quantity = purchase_order_entry.received_quantity
+    ordered_quantity = purchase_order_entry.quantity 
+    pending_receival = ordered_quantity - received_quantity
+    
+    if  self.quantity > pending_receival 
+      errors.add(:quantity , "Max penerimaan untuk item dari purchase order ini: #{pending_receival}" )
+    end
+  end   
+  
+  def unique_purchase_order_entry
+    purchase_order_entry = self.purchase_order_entry 
+    return nil if purchase_order_entry.nil? 
+    
+    parent = self.purchase_receival 
+    purchase_receival_entry_count = PurchaseReceivalEntry.where(
+      :purchase_order_entry_id => self.purchase_order_entry_id,
+      :purchase_receival_id => parent.id  
+    ).count 
+    
+    item = purchase_order_entry.item 
+    purchase_order = purchase_order_entry.purchase_order
+    msg = "Item #{item.name} dari pemesanan #{purchase_order.code} sudah terdaftar di penerimaan ini"
+ 
+    if not self.persisted? and purchase_receival_entry_count != 0
+      errors.add(:purchase_order_entry_id , msg ) 
+    elsif self.persisted? and purchase_receival_entry_count != 1 
+      errors.add(:purchase_order_entry_id , msg ) 
     end
   end
      
@@ -51,7 +95,6 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     return nil if purchase_receival.nil? 
     purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]
     
-    
     new_object = self.new
     new_object.creator_id = employee.id 
     new_object.vendor_id = purchase_receival.vendor_id 
@@ -74,12 +117,17 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     end
 
     purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]
-
+    old_purchase_order_entry = self.purchase_order_entry 
+    
     self.purchase_order_entry_id = purchase_order_entry.id 
     self.quantity                = params[:quantity]       
     self.item_id                 = purchase_order_entry.item_id
 
-
+    if purchase_order_entry.id != old_purchase_order_entry.id 
+      old_purchase_order_entry.update_fulfillment_status
+    end
+    
+    
     self.save 
 
     return self 

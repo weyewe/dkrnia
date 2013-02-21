@@ -1,0 +1,21 @@
+Order + Item Receival  (linked) 
+1. shouldn't receive more than ordered  (DONE) 
+2. shouldn't reduce the purchase order quantity if has received more than final ordered quantity
+(post confirm)
+
+3. shouldn only allow uniq item purchase order entry
+4. should only allow uniq purchase_order_entry_id in purchase receival 
+
+
+5. must update the pending receival on: 
+	post confirm delete/update purchase order entry
+	post confirm item receival + post confirm destroy 
+	
+6. Must update the ready stock on:
+	1. post confirm item receival update/delete 
+
+# create stock opname report => list all items + quantity 
+# when those 2 are done, do the delivery + create report. 
+
+
+# ENSURE to update the statistics.
