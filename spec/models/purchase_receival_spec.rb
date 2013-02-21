@@ -157,12 +157,12 @@ describe PurchaseReceival do
     context "creating purchase receival entry" do
       before(:each) do
         @diff = 2
-        received_quantity = @purchase_order_entry.quantity - @diff  
+        @received_quantity = @purchase_order_entry.quantity - @diff  
         @purchase_receival_entry = PurchaseReceivalEntry.create_by_employee( @admin, 
                   @purchase_receival, 
                   {
                     :purchase_order_entry_id => @purchase_order_entry.id ,
-                    :quantity => received_quantity
+                    :quantity => @received_quantity
                   })
       end
       
@@ -180,6 +180,33 @@ describe PurchaseReceival do
                   })
         @purchase_receival_entry.should_not be_valid 
       end
+      
+      context "confirm the purchase receival" do
+        before(:each) do
+          puts "Before confirming purchase receival\n"*10
+          @test_item.reload 
+          @initial_ready_quantity = @test_item.ready
+          @initial_pending_receival_quantity =  @test_item.pending_receival
+          @purchase_receival.confirm(@admin) 
+          @test_item.reload
+        end
+        
+        # it 'should confirm the purchase receival' do
+        #   @purchase_receival.is_confirmed.should be_true 
+        # end
+        # 
+        # it 'should reduce the pending receival quantity' do
+        #   @final_pending_receival_quantity = @test_item.pending_receival
+        #   diff = @initial_pending_receival_quantity   - @final_pending_receival_quantity
+        #   diff.should == @received_quantity
+        # end
+
+        it 'should increase the ready item' do
+          @final_ready_quantity = @test_item.ready
+          diff = @final_ready_quantity - @initial_ready_quantity
+          diff.should == @received_quantity
+        end
+      end 
     end
   end
  

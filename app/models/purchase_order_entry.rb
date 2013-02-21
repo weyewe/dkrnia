@@ -149,4 +149,8 @@ class PurchaseOrderEntry < ActiveRecord::Base
     self.purchase_receival_entries.where(:is_confirmed => true).sum('quantity')
   end
   
+  def pending_receival
+    self.quantity - self.received_quantity 
+  end
+  
 end

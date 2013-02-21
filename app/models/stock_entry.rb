@@ -6,14 +6,9 @@ class StockEntry < ActiveRecord::Base
   belongs_to :item
   has_many :stock_mutations 
   
-  
-  
- 
-  
   def available_quantity  
     quantity - used_quantity 
   end
-  
   
 =begin
   Adding stock entry during stock migration 
@@ -57,6 +52,52 @@ class StockEntry < ActiveRecord::Base
     stock_mutation.quantity = self.quantity 
     stock_mutation.save 
   end
+  
+=begin
+  ADDING STOCK_ENTRY after purchase receival
+=end
+
+  def self.generate_purchase_receival_stock_entry( purchase_receival_entry  ) 
+    new_object                      = StockEntry.new 
+    new_object.creator_id           = purchase_receival_entry.creator_id
+    new_object.quantity             = purchase_receival_entry.quantity 
+    # new_object.base_price_per_piece = stock_migration.average_cost 
+    new_object.item_id              = purchase_receival_entry.item_id 
+    new_object.entry_case           = STOCK_ENTRY_CASE[:purchase_receival]
+    new_object.source_document      = purchase_receival_entry.class.to_s
+    new_object.source_document_id   = purchase_receival_entry.id 
+    new_object.save  
+    
+    item = purchase_receival_entry.item  
+    
+    # how about this part? 
+    item.add_stock_and_recalculate_average_cost_post_stock_entry_addition( new_object ) 
+    
+    StockMutation.create_mutation_by_purchase_receival(  {
+      :creator_id               =>  purchase_receival_entry.creator_id   ,
+      :quantity                 => purchase_receival_entry.quantity      ,
+      :stock_entry_id           => new_object.id                 ,
+      :source_document_entry_id => purchase_receival_entry.id            ,
+      :source_document_id       => purchase_receival_entry.purchase_receival_id , 
+      :source_document_entry    => purchase_receival_entry.class.to_s    ,
+      :source_document          => purchase_receival_entry.purchase_receival.class.to_s    ,
+      :item_id                  => item.id
+    }) 
+  end
+  
+  def update_purchase_receival_stock_entry(purchase_receival_entry)
+    self.quantity = stock_migration.quantity 
+    self.save 
+    
+    stock_mutation = StockMutation.where(
+      :stock_entry_id => self.id , 
+      :source_document_entry_id => stock_migration.id,
+      :source_document_entry => stock_migration.class.to_s 
+    ).first 
+    stock_mutation.quantity = self.quantity 
+    stock_mutation.save 
+  end
+  
   
 =begin
   Adding stock entry because of stock conversion

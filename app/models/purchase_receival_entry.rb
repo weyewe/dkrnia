@@ -17,13 +17,22 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   validate :quantity_must_not_exceed_the_ordered_quantity
   validate :unique_purchase_order_entry 
   
-  after_save :update_item_pending_receival, :update_purchase_order_entry_fulfilment_status
-  after_destroy :update_item_pending_receival , :update_purchase_order_entry_fulfilment_status
+  after_save :update_item_pending_receival, :update_purchase_order_entry_fulfilment_status, :update_item_statistics
+  after_destroy :update_item_pending_receival , :update_purchase_order_entry_fulfilment_status, :update_item_statistics
   
   def update_item_pending_receival
+    return nil if not self.is_confirmed? 
     item = self.item 
     item.reload 
     item.update_pending_receival
+  end
+  
+  def update_item_statistics
+    puts "GONNA UPDATE ITEM STATISTIC"
+    return nil if not self.is_confirmed? 
+    item = self.item 
+    item.reload
+    item.update_ready_quantity
   end
   
   def update_purchase_order_entry_fulfilment_status
@@ -175,6 +184,10 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     self.is_confirmed = true 
     self.save
     self.reload 
+    
+    # create  stock_entry and the associated stock mutation 
+    StockEntry.generate_purchase_receival_stock_entry( self  ) 
+    
   end
   
 end

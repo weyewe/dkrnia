@@ -1,10 +1,10 @@
 Order + Item Receival  (linked) 
 1. shouldn't receive more than ordered  (DONE) 
 2. shouldn't reduce the purchase order quantity if has received more than final ordered quantity
-(post confirm)
+(post confirm)  ( don't allow shite )
 
 3. shouldn only allow uniq item purchase order entry
-4. should only allow uniq purchase_order_entry_id in purchase receival 
+4. should only allow uniq purchase_order_entry_id in purchase receival   (DONE)
 
 
 5. must update the pending receival on: 

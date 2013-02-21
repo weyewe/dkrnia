@@ -98,6 +98,7 @@ STOCK_ENTRY_CASE = {
   :scrap => 2,  # broken 
   :stock_conversion =>3, 
   :stock_adjustment => 4 , 
+  :purchase_receival => 5, 
 
 
     # => 10-19 == related to vendor 
@@ -115,6 +116,7 @@ MUTATION_CASE = {
   :sales_order => 1 ,
   :stock_conversion_source => 2 ,
   :scrap_item => 3,  # ready item -> scrap item
+  :purchase_receival => 4 ,
 
   # from  onward, it is the addition case  # not really
   :purchase_order => 29, 
