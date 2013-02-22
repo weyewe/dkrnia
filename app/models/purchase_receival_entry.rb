@@ -1,4 +1,6 @@
 class PurchaseReceivalEntry < ActiveRecord::Base
+  include StockMutationDocumentEntry
+  include StockEntryDocumentEntry
   # attr_accessible :title, :body
   belongs_to :purchase_receival
   belongs_to :purchase_order_entry
@@ -28,7 +30,6 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   end
   
   def update_item_statistics
-    puts "GONNA UPDATE ITEM STATISTIC"
     return nil if not self.is_confirmed? 
     item = self.item 
     item.reload
@@ -86,14 +87,23 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   def delete(employee)
     return nil if employee.nil?
     if self.is_confirmed?  
-      # do something. if it is linked to payment.. we need to do something
-      # if it is not linked.. no need 
+      ActiveRecord::Base.transaction do
+        self.post_confirm_delete( employee)  
+        return self
+      end 
     end
+    
     
     self.destroy 
   end
   
   def post_confirm_delete( employee)  
+    # if there is stock_usage_entry.. refresh => dispatch to other available shite 
+    stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+    stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
+    
+    stock_entry.destroy 
+    stock_mutation.destroy 
     self.destroy 
   end
   
@@ -123,6 +133,8 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   def update_by_employee( employee, params ) 
     if self.is_confirmed? 
       # later on, put authorization 
+      self.post_confirm_update( employee, params) 
+      return self 
     end
 
     purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]
@@ -131,21 +143,47 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     self.purchase_order_entry_id = purchase_order_entry.id 
     self.quantity                = params[:quantity]       
     self.item_id                 = purchase_order_entry.item_id
-
-    if purchase_order_entry.id != old_purchase_order_entry.id 
-      old_purchase_order_entry.update_fulfillment_status
-    end
-    
-    
+ 
     self.save 
-
     return self 
   end
   
-  
-  # def post_confirm_update(employee, params)
-  # end
-  
+  def post_confirm_update(employee, params)
+    
+    purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]
+    old_purchase_order_entry = self.purchase_order_entry
+    
+    
+    
+    if params[:purchase_order_entry_id] != self.purchase_order_entry_id
+      self.purchase_order_entry_id = params[:purchase_order_entry_id]
+      self.quantity                = 0 
+      self.item_id                 = purchase_order_entry.item_id
+      self.save
+      
+      # we need to shift the stock_usage_entry from the associated stock entry to somewhere else
+      # then, after shifting, we can re-point the data 
+      stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+      stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
+      
+      # use the original quantity 
+      self.quantity = params[:quantity]
+      self.save
+      stock_entry.purchase_receival_change_item( self )
+      stock_mutation.purchase_receival_change_item( self )  
+    else
+      # only changing the quantity 
+      self.quantity                = params[:quantity]
+      self.save
+      
+      stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+      stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
+    end
+    
+    if purchase_order_entry.id != old_purchase_order_entry.id 
+      old_purchase_order_entry.update_fulfillment_status
+    end
+  end
   
   def generate_code
     start_datetime = Date.today.at_beginning_of_month.to_datetime
@@ -187,7 +225,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     
     # create  stock_entry and the associated stock mutation 
     StockEntry.generate_purchase_receival_stock_entry( self  ) 
-    
+    StockMutation.generate_purchase_receival_stock_mutation( self  ) 
   end
   
 end

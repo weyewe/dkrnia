@@ -111,6 +111,12 @@ STOCK_ENTRY_CASE = {
 
 } 
 
+STOCK_ENTRY_USAGE = {
+  :sales => 1 ,
+  :repair_spare_part => 2, 
+  :in_house_repair => 3
+}
+
 MUTATION_CASE = {
   :stock_migration => 0, 
   :sales_order => 1 ,

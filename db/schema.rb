@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130219071434) do
+ActiveRecord::Schema.define(:version => 20130222021504) do
 
   create_table "companies", :force => true do |t|
     t.string   "name"
@@ -142,7 +142,7 @@ ActiveRecord::Schema.define(:version => 20130219071434) do
     t.integer  "creator_id"
     t.integer  "source_document_id"
     t.string   "source_document"
-    t.integer  "entry_case"
+    t.integer  "entry_case",                                          :default => 0
     t.integer  "quantity"
     t.integer  "used_quantity",                                       :default => 0
     t.integer  "scrapped_quantity",                                   :default => 0
@@ -151,6 +151,18 @@ ActiveRecord::Schema.define(:version => 20130219071434) do
     t.decimal  "base_price_per_piece", :precision => 12, :scale => 2, :default => 0.0
     t.datetime "created_at",                                                             :null => false
     t.datetime "updated_at",                                                             :null => false
+  end
+
+  create_table "stock_entry_usages", :force => true do |t|
+    t.integer  "quantity"
+    t.integer  "source_document_entry_id"
+    t.integer  "source_document_id"
+    t.string   "source_document_entry"
+    t.string   "source_document"
+    t.integer  "stock_entry_id"
+    t.integer  "case"
+    t.datetime "created_at",               :null => false
+    t.datetime "updated_at",               :null => false
   end
 
   create_table "stock_migrations", :force => true do |t|

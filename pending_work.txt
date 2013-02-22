@@ -19,3 +19,27 @@ Order + Item Receival  (linked)
 
 
 # ENSURE to update the statistics.
+
+
+# CORNER CASES: post confirm update, about the stock. What is the policy? 
+#	=> StockEntry is useful in tracking the CoGS (cost of goods sold)
+#	easy way => just append the usage to the end 
+# right way (periodically) => insert it, so that it is sequential. 
+	# which means that first_sequence + second_sequence 
+	# if the final quantity < initial quantity, the usage will be inserted in between first_sequence and #
+	# second sequence. computationally expensive. Recalculate everything. Total CoGS will change 
+	# however, the time it takes and number of operation is bad. 
+	# THIS IS A FUCKING CORNER CASE. MOST LIKELY WON't happen 
+	
+	# if we append the usage , so the excess is using the next available stock entry ( not sequential ), 
+		# theoritically wrong. However, much simpler. use this one. 
+		
+		
+7. If the stock entry has been used up, and there is source document quantity change. what will happen?
+
+8. However, if the final value is wrong, don't allow. 
+
+
+
+# STOCK MUTATION HISTORY is Tough! 
+

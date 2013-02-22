@@ -9,30 +9,36 @@ class StockMutation < ActiveRecord::Base
                   
   belongs_to :item
   after_save :update_item_statistics
-  
+   
 
   def update_item_statistics
     item.update_ready_quantity
   end
   
   
-  def StockMutation.create_mutation_by_stock_migration( object_params)
+  def StockMutation.generate_stock_migration_stock_mutation( stock_migration )
     new_object = StockMutation.new 
     
-    new_object.creator_id               = object_params[:creator_id]
+    new_object.creator_id               = stock_migration.creator_id
     
-    new_object.quantity                 = object_params[:quantity]
-    new_object.stock_entry_id           = object_params[:stock_entry_id] 
+    new_object.quantity                 = stock_migration.quantity
     
-    new_object.source_document_entry_id = object_params[:source_document_entry_id]     
-    new_object.source_document_id       = object_params[:source_document_id]     
-    new_object.source_document_entry    = object_params[:source_document_entry]  
-    new_object.source_document          = object_params[:source_document]   
-    new_object.item_id                  = object_params[:item_id]   
+    new_object.source_document_entry_id = stock_migration.id    
+    new_object.source_document_id       = stock_migration.id 
+    new_object.source_document_entry    = stock_migration.class.to_s
+    new_object.source_document          = stock_migration.class.to_s
+    new_object.item_id                  = stock_migration.item_id
     new_object.mutation_case            = MUTATION_CASE[:stock_migration] 
     new_object.mutation_status          = MUTATION_STATUS[:addition]  
     
     new_object.save 
+  end
+  
+  def update_stock_migration_stock_mutation(stock_migration)
+    return nil if stock_migration.quantity == self.quantity 
+    
+    self.quantity = stock_migration.quantity 
+    self.save 
   end
   
   def StockMutation.create_stock_adjustment( employee, stock_adjustment)
@@ -71,7 +77,10 @@ class StockMutation < ActiveRecord::Base
                 
                 
       requested_quantity =  stock_adjustment.adjustment_quantity
-      
+      # and for price deduction? 
+      # over here, we have assumption that for a given stock entry, it is enough to be deducted.
+      # that is not the case though. 
+      # the deduction might come from several stock entries. 
       StockMutation.deduct_ready_stock(
               employee, 
               requested_quantity, 
@@ -87,25 +96,29 @@ class StockMutation < ActiveRecord::Base
   end
   
   
-  def StockMutation.create_mutation_by_purchase_receival( object_params)
+  def StockMutation.generate_purchase_receival_stock_mutation( purchase_receival_entry  ) 
     new_object = StockMutation.new 
     
-    new_object.creator_id               = object_params[:creator_id]
-    
-    new_object.quantity                 = object_params[:quantity]
-    new_object.stock_entry_id           = object_params[:stock_entry_id] 
-    
-    new_object.source_document_entry_id = object_params[:source_document_entry_id]     
-    new_object.source_document_id       = object_params[:source_document_id]     
-    new_object.source_document_entry    = object_params[:source_document_entry]  
-    new_object.source_document          = object_params[:source_document]   
-    new_object.item_id                  = object_params[:item_id]   
+    new_object.creator_id               = purchase_receival_entry.purchase_receival.creator_id
+    new_object.quantity                 = purchase_receival_entry.quantity
+    new_object.source_document_entry_id = purchase_receival_entry.id 
+    new_object.source_document_id       = purchase_receival_entry.purchase_receival_id
+    new_object.source_document_entry    = purchase_receival_entry.class.to_s
+    new_object.source_document          = purchase_receival_entry.purchase_receival.class.to_s
+    new_object.item_id                  = purchase_receival_entry.purchase_order_entry.item_id 
     new_object.mutation_case            = MUTATION_CASE[:purchase_receival] 
     new_object.mutation_status          = MUTATION_STATUS[:addition]  
     
-    new_object.save 
+    new_object.save
   end
   
+  def purchase_receival_change_item( purchase_receival_entry ) 
+    self.quantity = purchase_receival_entry.quantity
+    self.item_id = purchase_receival_entry.purchase_order_entry.item_id 
+    self.save 
+  end
+  
+   
   def StockMutation.create_mutation_by_stock_conversion( object_params)
     new_object = StockMutation.new 
     

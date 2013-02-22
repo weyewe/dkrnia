@@ -1,4 +1,6 @@
 class StockAdjustment < ActiveRecord::Base
+  include StockMutationDocument
+  include StockMutationDocumentEntry
   # attr_accessible :title, :body
   validates_presence_of :adjustment_case, 
                         :physical_quantity , :ready_quantity, :adjustment_quantity

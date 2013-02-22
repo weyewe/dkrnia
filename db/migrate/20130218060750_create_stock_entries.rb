@@ -9,7 +9,7 @@ class CreateStockEntries < ActiveRecord::Migration
       
       t.integer :source_document_id  
       t.string :source_document   
-      t.integer :entry_case, :default => STOCK_ENTRY_CASE[:initial_migration]
+      t.integer :entry_case, :default => STOCK_ENTRY_CASE[:stock_migration]
       
       
       t.integer :quantity  

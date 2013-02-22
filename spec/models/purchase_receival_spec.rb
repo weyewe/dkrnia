@@ -129,7 +129,6 @@ describe PurchaseReceival do
                   :quantity => received_quantity
                 }) 
                 
-      puts 'after creating purchase receival entry'
       @purchase_receival_entry.should be_valid 
     end
     
@@ -183,7 +182,6 @@ describe PurchaseReceival do
       
       context "confirm the purchase receival" do
         before(:each) do
-          puts "Before confirming purchase receival\n"*10
           @test_item.reload 
           @initial_ready_quantity = @test_item.ready
           @initial_pending_receival_quantity =  @test_item.pending_receival

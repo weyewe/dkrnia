@@ -1,4 +1,8 @@
 class StockMigration < ActiveRecord::Base
+  include StockMutationDocument
+  include StockMutationDocumentEntry 
+  include StockEntryDocument
+  include StockEntryDocumentEntry
   # attr_accessible :title, :body
   belongs_to :item
   validates_presence_of :quantity 
@@ -19,15 +23,7 @@ class StockMigration < ActiveRecord::Base
   end
   
   
-  def stock_entry 
-    stock_migration = self 
-    StockEntry.find(:first, :conditions => {
-      :source_document => stock_migration.class.to_s, 
-      :source_document_id => stock_migration.id ,
-      :entry_case =>  STOCK_ENTRY_CASE[:initial_migration], 
-      :is_addition => true 
-    })
-  end
+   
   
   def generate_code
     # get the total number of sales order created in that month 
@@ -92,12 +88,14 @@ class StockMigration < ActiveRecord::Base
     
     self.creator_id = employee.id 
      
+    initial_quantity = self.quantity 
     self.quantity     = object_params[:quantity]
+    
+    # guard.. if there is error, won't go through
     ActiveRecord::Base.transaction do
       if self.save   
-        if not stock_entry.nil?
-          stock_entry.update_stock_migration_stock_entry( self )
-        end
+        stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+        stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil? 
       end
     end
     
@@ -124,6 +122,9 @@ class StockMigration < ActiveRecord::Base
       
       # create the Stock Entry  + Stock Mutation =>  Update Ready Item 
       StockEntry.generate_stock_migration_stock_entry( self  ) 
+      StockMutation.generate_stock_migration_stock_mutation(self ) 
+      # item = self.item  
+      # item.add_stock_and_recalculate_average_cost_post_stock_entry_addition 
     end
     
   end

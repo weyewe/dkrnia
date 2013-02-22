@@ -156,7 +156,6 @@ describe PurchaseOrder do
            @update_quantity = 9
            @test_item.reload 
            @pre_update_pending_receival = @test_item.pending_receival
-           puts "This is the one deleting\n"*10
            @purchase_order_entry.delete(@admin )
            @test_item.reload 
          end

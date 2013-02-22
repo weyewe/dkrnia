@@ -5,9 +5,15 @@ class StockEntry < ActiveRecord::Base
   # attr_accessible :title, :body
   belongs_to :item
   has_many :stock_mutations 
+  has_many :stock_entry_usages
   
   def available_quantity  
-    quantity - used_quantity 
+    quantity - used_quantity  - scrapped_quantity
+  end
+  
+  def self.first_available_stock(item) 
+    # FOR FIFO , we will devour the first available item
+    StockEntry.where(:is_finished => false, :item_id => item.id ).order("id ASC").first 
   end
   
 =begin
@@ -19,39 +25,60 @@ class StockEntry < ActiveRecord::Base
     new_object.quantity             = stock_migration.quantity 
     # new_object.base_price_per_piece = stock_migration.average_cost 
     new_object.item_id              = stock_migration.item_id 
-    new_object.entry_case           = STOCK_ENTRY_CASE[:initial_migration]
+    new_object.entry_case           = STOCK_ENTRY_CASE[:stock_migration]
     new_object.source_document      = stock_migration.class.to_s
     new_object.source_document_id   = stock_migration.id 
     new_object.save  
-    
-    item = stock_migration.item  
-    
-    item.add_stock_and_recalculate_average_cost_post_stock_entry_addition( new_object ) 
-    
-    StockMutation.create_mutation_by_stock_migration(  {
-      :creator_id               =>  stock_migration.creator_id   ,
-      :quantity                 => stock_migration.quantity      ,
-      :stock_entry_id           => new_object.id                 ,
-      :source_document_entry_id => stock_migration.id            ,
-      :source_document_id       => stock_migration.id            ,
-      :source_document_entry    => stock_migration.class.to_s    ,
-      :source_document          => stock_migration.class.to_s    ,
-      :item_id                  => item.id
-    }) 
   end
   
   def update_stock_migration_stock_entry(stock_migration)
-    self.quantity = stock_migration.quantity 
-    self.save 
-    
-    stock_mutation = StockMutation.where(
-      :stock_entry_id => self.id , 
-      :source_document_entry_id => stock_migration.id,
-      :source_document_entry => stock_migration.class.to_s 
-    ).first 
-    stock_mutation.quantity = self.quantity 
-    stock_mutation.save 
+    return nil if stock_migration.quantity == self.quantity 
+      
+    if stock_migration.quantity > self.quantity 
+      # expansion case
+      self.quantity = stock_migration.quantity 
+      self.is_finished = false
+      self.save 
+    else
+      # contraction case
+      
+      if stock_migration.quantity > self.used_quantity 
+        self.is_finished = false   
+        self.quantity = stock_migration.quantity 
+        self.save
+      elsif stock_migration.quantity == self.used_quantity 
+        self.is_finished = true 
+        self.quantity = stock_migration.quantity 
+        self.save
+      elsif stock_migration.quantity < self.used_quantity
+        dispatchable_quantity = self.used_quantity - stock_migration.quantity 
+        self.is_finished = true 
+        self.quantity = stock_migration.quantity 
+        self.save
+        
+        StockEntry.dispatch_usage( self, dispatchable_quantity )  
+      end
+    end
   end
+  
+  def self.dispatch_usage( stock_entry, dispatchable_quantity )
+    stock_entry_usages = stock_entry.stock_entry_usages.order("created_at DESC")
+    
+    dispatched_quantity = 0 
+    stock_entry.stock_entry_usages.order("created_at DESC").each do |stock_entry_usage| 
+      if dispatchable_quantity > 0  &&  stock_entry_usage.quantity <=  dispatchable_quantity 
+        stock_entry_usage.assign_stock_entry  
+        dispatchable_quantity -= stock_entry_usage.quantity
+      elsif dispatchable_quantity > 0  &&  stock_entry_usage.quantity > dispatchable_quantity 
+        stock_entry_usage.assign_partial_stock_entry( dispatchable_quantity)
+        dispatchable_quantity -= dispatchable_quantity
+      end
+      
+      break if dispatchable_quantity == 0 
+    end 
+  end
+  
+  
   
 =begin
   ADDING STOCK_ENTRY after purchase receival
@@ -62,29 +89,29 @@ class StockEntry < ActiveRecord::Base
     new_object.creator_id           = purchase_receival_entry.creator_id
     new_object.quantity             = purchase_receival_entry.quantity 
     # new_object.base_price_per_piece = stock_migration.average_cost 
-    new_object.item_id              = purchase_receival_entry.item_id 
+    new_object.item_id              = purchase_receival_entry.purchase_order_entry.item_id 
     new_object.entry_case           = STOCK_ENTRY_CASE[:purchase_receival]
     new_object.source_document      = purchase_receival_entry.class.to_s
     new_object.source_document_id   = purchase_receival_entry.id 
     new_object.save  
-    
-    item = purchase_receival_entry.item  
-    
-    # how about this part? 
-    item.add_stock_and_recalculate_average_cost_post_stock_entry_addition( new_object ) 
-    
-    StockMutation.create_mutation_by_purchase_receival(  {
-      :creator_id               =>  purchase_receival_entry.creator_id   ,
-      :quantity                 => purchase_receival_entry.quantity      ,
-      :stock_entry_id           => new_object.id                 ,
-      :source_document_entry_id => purchase_receival_entry.id            ,
-      :source_document_id       => purchase_receival_entry.purchase_receival_id , 
-      :source_document_entry    => purchase_receival_entry.class.to_s    ,
-      :source_document          => purchase_receival_entry.purchase_receival.class.to_s    ,
-      :item_id                  => item.id
-    }) 
+  
   end
   
+  def purchase_receival_change_item(purchase_receival_entry)
+    self.quantity                = purchase_receival_entry.quantity 
+    self.item_id                 = purchase_receival_entry.purchase_order_entry.item_id 
+    self.is_finished             = false 
+    self.used_quantity           = 0
+    self.scrapped_quantity       = 0 
+    self.save 
+  end
+  
+  
+  # if the quantity has been used. 
+  # final quantity < initial quantity 
+    # get the excess usage to 2 stock mutations 
+  # if final quantity > initial quantity 
+    # create excess usage to stock mutations 
   def update_purchase_receival_stock_entry(purchase_receival_entry)
     self.quantity = stock_migration.quantity 
     self.save 
@@ -114,7 +141,7 @@ class StockEntry < ActiveRecord::Base
     new_object.quantity             = stock_converter_entry_target.quantity 
     new_object.base_price_per_piece = stock_conversion.average_cost 
     new_object.item_id              = stock_conversion.item_id 
-    new_object.entry_case           = STOCK_ENTRY_CASE[:initial_migration]
+    new_object.entry_case           = STOCK_ENTRY_CASE[:stock_migration]
     new_object.source_document      = stock_conversion.class.to_s
     new_object.source_document_id   = stock_conversion.id 
     new_object.save  
@@ -176,7 +203,7 @@ class StockEntry < ActiveRecord::Base
   end
   
   def stock_migration
-    if self.entry_case == STOCK_ENTRY_CASE[:initial_migration]
+    if self.entry_case == STOCK_ENTRY_CASE[:stock_migration]
       StockMigration.find_by_id self.source_document_id
     else
       return nil
