@@ -1,0 +1,72 @@
+<div id='details'>
+	
+	<table class="table table-bordered table-striped table-highlight">
+		<thead>
+			<tr>
+				<th>Code</th>
+				<th>Customer</th>
+				<th>Tanggal Kirim</th>  
+				<th>Status</th>  
+				<th>Total Delivery Item</th>  
+				<th colspan='2'>Action</th>
+			</tr>
+		</thead>
+		<tbody> 
+			<% object = parent %>
+			<tr id="parent_entry-<%= object.id %>">
+				<td>
+					<%= object.code %>
+				</td>
+				<td>
+					<%= "#{object.customer.name}" %>
+				</td>
+
+				<td>
+					<%= print_date(object.delivery_date )%>
+				</td>
+
+			 	<td>
+					<% if object.is_confirmed == true %>
+						<span class="label label-primary">confirmed</span>
+					<% else %>
+						<span class="label label-tertiary">Pending</span>
+					<% end %>
+				</td>
+
+				<td>
+					<%= object.delivery_entries.count %>
+				</td>
+
+ 
+					<td>
+						<%= link_to delete_delivery_url(:details => 1), 
+							:class =>"delete_entry", 
+							:style => "cursor:pointer; text-decoration:none;" do %>
+							<i class='icon-remove'></i>Delete
+						<% end %> 
+					</td>
+
+					<td>
+						<%= link_to edit_delivery_url(object,:details => 1), 
+							:class =>"edit_entry modal-toggler", 
+							:style => "cursor:pointer; text-decoration:none;" do %>
+							<i class='icon-edit'></i>Edit
+						<% end %>
+					</td>
+		 
+
+			</tr>
+			 
+		</tbody>
+	</table>
+ 
+	
+	<hr />
+	
+	
+	<%= render :partial => 'delivery_entries/delivery/item_list', :locals => {
+		:objects => children, 
+		:parent => parent,
+		:details => 1 
+	}%>
+</div>

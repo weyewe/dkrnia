@@ -47,6 +47,9 @@ Dikarunia::Application.routes.draw do
   match 'generate_stock_adjustment'  => 'stock_adjustments#generate_stock_adjustment' , :as => :generate_stock_adjustment, :method => :post 
   
   
+  resources :deliveries do
+    resources :delivery_entries 
+  end
   
 
 =begin

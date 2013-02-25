@@ -61,13 +61,32 @@ class StockEntry < ActiveRecord::Base
     end
   end
   
+  def self.generate_stock_adjustment_stock_entry( stock_adjustment ) 
+    return nil if stock_adjustment.nil? 
+    
+    item = stock_adjustment.item 
+    new_object = StockEntry.new 
+    new_object.creator_id = stock_adjustment.creator_id 
+    new_object.quantity = stock_adjustment.adjustment_quantity
+    new_object.base_price_per_piece  = item.average_cost 
+    new_object.item_id  = item.id  
+    new_object.entry_case =  STOCK_ENTRY_CASE[:stock_adjustment]
+    new_object.source_document = stock_adjustment.class.to_s
+    new_object.source_document_id = stock_adjustment.id  
+    new_object.save 
+    
+    item.update_ready_quantity
+    
+    # item.add_stock_and_recalculate_average_cost_post_stock_entry_addition( new_object )
+  end
+  
   def self.dispatch_usage( stock_entry, dispatchable_quantity )
-    stock_entry_usages = stock_entry.stock_entry_usages.order("created_at DESC")
+    stock_entry_usages = stock_entry.stock_entry_usages.order("id DESC")
     
     dispatched_quantity = 0 
-    stock_entry.stock_entry_usages.order("created_at DESC").each do |stock_entry_usage| 
+    stock_entry.stock_entry_usages.order("id DESC").each do |stock_entry_usage| 
       if dispatchable_quantity > 0  &&  stock_entry_usage.quantity <=  dispatchable_quantity 
-        stock_entry_usage.assign_stock_entry  
+        stock_entry_usage.assign_stock_entry( stock_entry.item, stock_entry_usage.quantity )   
         dispatchable_quantity -= stock_entry_usage.quantity
       elsif dispatchable_quantity > 0  &&  stock_entry_usage.quantity > dispatchable_quantity 
         stock_entry_usage.assign_partial_stock_entry( dispatchable_quantity)
@@ -189,10 +208,8 @@ class StockEntry < ActiveRecord::Base
      
     self.unmark_as_finished
     
-    
-    
     item = self.item 
-    item.add_ready_quantity( quantity_to_be_recovered ) 
+    item.update_ready_quantity
     
     return self 
   end

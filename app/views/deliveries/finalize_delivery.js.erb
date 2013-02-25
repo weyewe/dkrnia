@@ -1,0 +1,48 @@
+$(document).ready(function(){
+	var $form_wrapper = $("#actionbar"); 
+	$form_wrapper.spin(false); 
+ 
+
+	
+	<% post_confirm_bar = escape_javascript(  render :partial => "delivery_entries/delivery/post_confirm_bar", 
+		:locals => {
+	    :parent => @delivery  
+  })%>
+	
+	$("#actionbar").replaceWith('<%=  post_confirm_bar %>');
+	
+	
+	<% if  @delivery.is_finalized?  %>
+	 
+	// replace the actionbar  with postConfirmBar => to delete the sales order 
+		
+	
+	// refresh the itemList => no edit or delete 
+		<% item_list = escape_javascript(  render :partial => "delivery_entries/delivery/item_list", 
+		:locals => {
+	    :parent => @delivery ,
+			:objects => @delivery.delivery_entries.order("created_at DESC") 
+	  })%>
+	
+		$("#tableview").replaceWith('<%= item_list %>');
+		
+		
+	
+	// alert msgbox: success confirming 
+		$.msgbox("Berhasil Finalisasi surat jalan: <%= @delivery.code %>", 
+						{type: "info"});
+						 
+		
+		
+	<% else %> 
+		// replace the form, show the edit 
+	 
+		 
+		$.msgbox("Error Finalisasi  surat jalan: <%= @delivery.code %>", 
+					{type: "error"});
+	<% end %>
+ 
+	jQuery('.prevent_double_submit').preventDoubleSubmit();
+});
+
+

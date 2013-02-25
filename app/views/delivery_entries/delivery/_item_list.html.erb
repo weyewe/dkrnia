@@ -1,0 +1,23 @@
+<table class="table table-bordered table-striped table-highlight" id='tableview'>
+	<thead>
+		<tr>
+			<th>Code</th>
+			<th>Nama</th> 
+			<th>Jumlah Kirim</th> 
+			<th>Jumlah Konfirmasi</th>
+			<th>Action</th> 
+		</tr>
+	</thead>
+	<tbody> 
+		<% if not defined?(details)  %>
+			<% details = 0 %>
+		<% end %>
+		<% objects.each do |object| %>
+			<%= render :partial =>  'delivery_entries/entry', :locals => {
+				:object => object ,
+				:parent => parent ,
+				:details => details
+			} %> 
+		<% end %>
+	</tbody>
+</table>

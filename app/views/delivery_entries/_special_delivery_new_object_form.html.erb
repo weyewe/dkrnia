@@ -1,0 +1,48 @@
+<% if new_object.persisted? %>
+	<% id = 'edit_object'%>
+<% else %>
+	<% id = 'new_object'%>
+<% end %>
+
+<%= simple_form_for( new_object, :url => url,
+      :method => :post , 
+      :html => {:class => " form-horizontal prevent_double_submit ajax-form   no_content_form",
+        :id => "#{id}"}) do |f| %>
+ 
+   
+ 
+
+	<%= f.input :sales_item_id, :label => "Material" do %>
+     <%= f.select :sales_item_id, 
+         customer.all_selectable_sales_items %>
+  <% end %>
+
+	<%= f.input :entry_case, :label => "Kondisi Barang" do %>
+     <%= f.select :entry_case, 
+         DeliveryEntry.all_selectable_delivery_entry_cases %>
+  <% end %>
+
+ 
+	
+	<hr />
+		<%= f.input :quantity_sent, :label =>"Kuantitas"   %>
+		<%= f.input :quantity_sent_weight, :label =>"Berat Total", 
+				:hint => "Dalam kilogram, sensitif sampai 2 decimal. Contoh: <b>2.15</b>kg"   %>
+	 
+ 
+		
+	
+	
+
+  <div class="form-actions">
+	
+		<% if new_object.persisted? %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Update Delivery Entry" %>
+		<% else %>
+			<%= f.button :submit , :class => "btn btn-primary", :value=> "Create Delivery Entry" %>
+		<% end %>
+		
+  </div>
+<% end %>
+
+

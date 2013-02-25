@@ -112,9 +112,9 @@ STOCK_ENTRY_CASE = {
 } 
 
 STOCK_ENTRY_USAGE = {
-  :sales => 1 ,
-  :repair_spare_part => 2, 
-  :in_house_repair => 3
+  :delivery         => 1,
+  :stock_adjustment => 2, 
+  :in_house_repair  => 3 
 }
 
 MUTATION_CASE = {
@@ -123,13 +123,13 @@ MUTATION_CASE = {
   :stock_conversion_source => 2 ,
   :scrap_item => 3,  # ready item -> scrap item
   :purchase_receival => 4 ,
-
-  # from  onward, it is the addition case  # not really
-  :purchase_order => 29, 
-  :sales_return => 30,
-  :stock_conversion_target => 31 , 
-  :scrap_item_replacement => 32,    # scrap item -> ready item 
-  :stock_adjustment => 33 
+  
+  :stock_adjustment => 33 ,
+   # deduction from now on
+  
+  :delivery => 34,
+  :delivery_lost => 35,
+  :delivery_returned => 36
 }
 
 MUTATION_STATUS = {

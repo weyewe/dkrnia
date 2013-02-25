@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130222021504) do
+ActiveRecord::Schema.define(:version => 20130222101859) do
 
   create_table "companies", :force => true do |t|
     t.string   "name"
@@ -19,6 +19,54 @@ ActiveRecord::Schema.define(:version => 20130222021504) do
     t.string   "phone"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "customers", :force => true do |t|
+    t.string   "name"
+    t.string   "contact_person"
+    t.string   "phone"
+    t.string   "mobile"
+    t.string   "email"
+    t.string   "bbm_pin"
+    t.text     "office_address"
+    t.text     "delivery_address"
+    t.integer  "town_id"
+    t.boolean  "is_deleted",       :default => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+  end
+
+  create_table "deliveries", :force => true do |t|
+    t.integer  "employee_id"
+    t.integer  "creator_id"
+    t.date     "delivery_date"
+    t.string   "code"
+    t.boolean  "is_confirmed",  :default => false
+    t.integer  "confirmer_id"
+    t.datetime "confirmed_at"
+    t.boolean  "is_finalized",  :default => false
+    t.integer  "finalizer_id"
+    t.datetime "finalized_at"
+    t.boolean  "is_deleted",    :default => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
+
+  create_table "delivery_entries", :force => true do |t|
+    t.integer  "creator_id"
+    t.string   "code"
+    t.integer  "item_id"
+    t.integer  "delivery_id"
+    t.integer  "quantity_sent",      :default => 0
+    t.integer  "quantity_confirmed", :default => 0
+    t.integer  "quantity_returned",  :default => 0
+    t.integer  "quantity_lost",      :default => 0
+    t.text     "note"
+    t.boolean  "is_confirmed",       :default => false
+    t.boolean  "is_deleted",         :default => false
+    t.boolean  "is_finalized",       :default => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
   end
 
   create_table "employees", :force => true do |t|
@@ -96,7 +144,7 @@ ActiveRecord::Schema.define(:version => 20130222021504) do
     t.integer  "purchase_receival_id"
     t.integer  "purchase_order_entry_id"
     t.integer  "vendor_id"
-    t.integer  "quantity"
+    t.integer  "quantity",                :default => 0
     t.boolean  "is_confirmed",            :default => false
     t.boolean  "is_deleted",              :default => false
     t.datetime "created_at",                                 :null => false
@@ -160,6 +208,7 @@ ActiveRecord::Schema.define(:version => 20130222021504) do
     t.string   "source_document_entry"
     t.string   "source_document"
     t.integer  "stock_entry_id"
+    t.integer  "item_id"
     t.integer  "case"
     t.datetime "created_at",               :null => false
     t.datetime "updated_at",               :null => false

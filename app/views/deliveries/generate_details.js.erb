@@ -1,0 +1,27 @@
+$(document).ready(function(){
+	var $form = $("#details_trigger_form");
+	
+	$form.spin(false);
+	
+	<% details = escape_javascript( render :partial => "deliveries/details", 
+		:locals => {
+	    :parent => @parent ,
+			:children 		=> @children
+  })%>
+ 
+	var $details = $("#details")
+	var $details_wrapper = $("#details_wrapper");
+	var $details_dummy = $("#details_dummy");
+	 
+	// 2. the viewer + add shite
+	if($details.length == 0 ){
+		$details_wrapper.append('<%= details %>');
+	}else{
+		$details.replaceWith('<%= details %>')
+	}
+	
+	$details_wrapper.show();
+	$details_dummy.hide();
+
+	jQuery('.prevent_double_submit').preventDoubleSubmit();
+});

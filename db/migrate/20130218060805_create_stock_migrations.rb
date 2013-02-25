@@ -5,7 +5,7 @@ class CreateStockMigrations < ActiveRecord::Migration
       t.string :code 
       t.integer :creator_id 
       
-      t.integer :quantity 
+      t.integer :quantity  
       
       t.boolean :is_confirmed, :default => false 
       t.integer :confirmer_id 

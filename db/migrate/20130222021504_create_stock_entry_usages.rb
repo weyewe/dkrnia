@@ -11,6 +11,7 @@ class CreateStockEntryUsages < ActiveRecord::Migration
       
       
       t.integer :stock_entry_id 
+      t.integer :item_id 
       
       t.integer :case , :default => STOCK_ENTRY_USAGE[:delivery]
       

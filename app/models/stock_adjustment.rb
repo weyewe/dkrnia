@@ -59,6 +59,7 @@ class StockAdjustment < ActiveRecord::Base
       if physical_to_ready_diff > 0 
         new_stock_adjustment.adjustment_quantity = physical_to_ready_diff
         new_stock_adjustment.adjustment_case = STOCK_ADJUSTMENT_CASE[:addition]
+        
       elsif physical_to_ready_diff < 0  
         new_stock_adjustment.adjustment_quantity = physical_to_ready_diff * -1 
         new_stock_adjustment.adjustment_case = STOCK_ADJUSTMENT_CASE[:deduction] 
@@ -68,6 +69,13 @@ class StockAdjustment < ActiveRecord::Base
          
       if new_stock_adjustment.save
         StockMutation.create_stock_adjustment(employee,  new_stock_adjustment )
+        
+        if new_stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:addition]
+          StockEntry.generate_stock_adjustment_stock_entry( new_stock_adjustment )
+        elsif new_stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:deduction]
+          StockEntryUsage.generate_stock_adjustment_stock_entry_usage( new_stock_adjustment ) 
+        end
+        
       end
         
       

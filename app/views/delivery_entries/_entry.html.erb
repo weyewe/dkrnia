@@ -1,0 +1,74 @@
+<% if not defined?(details)  %>
+	<% details = 0 %>
+<% end %>
+
+<tr id="entry-<%= object.id %>">
+	<td>
+		<%= object.code %>
+	</td>
+	<td>
+		<%= object.sales_item.code %> <br />
+		<%= object.sales_item.name %> <br />
+		
+		Jenis Pengiriman:
+		<% if object.entry_case == DELIVERY_ENTRY_CASE[:normal] %>
+			[normal]
+		<% elsif object.entry_case == DELIVERY_ENTRY_CASE[:premature] %>
+			[premature]
+		<% elsif object.entry_case == DELIVERY_ENTRY_CASE[:guarantee_return] %>
+      [Hasil Retur Garansi]
+    <% elsif object.entry_case == DELIVERY_ENTRY_CASE[:bad_source_fail_post_production] %>
+      [Casting Keropos]
+    <% elsif object.entry_case == DELIVERY_ENTRY_CASE[:technical_failure_post_production] %> 
+      [Gagal Bubut]
+    <% end %>
+		<br />
+		
+		Kondisi barang: 
+		<% if object.item_condition == DELIVERY_ENTRY_ITEM_CONDITION[:production] %>
+			[Hasil Cor]
+		<% elsif object.item_condition == DELIVERY_ENTRY_ITEM_CONDITION[:post_production] %>
+			[Hasil Bubut]
+    <% end %>
+		<br />
+	</td>
+	
+	<td>
+		
+		Kuantitas: <b><%= object.quantity_sent %></b> <br />
+		Berat		: <b><%= object.quantity_sent_weight.to_s %></b> kg
+		
+		<hr />
+		<%= link_to edit_delivery_delivery_entry_url(parent, object,:details => details) , 
+			:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
+			<i class='icon-edit'></i>Edit
+		<% end %>
+		
+	</td>
+	
+	<td>
+		Terkirim: <b><%= object.quantity_confirmed %></b> 
+		<hr />
+		
+		Retur:	<b><%= object.quantity_returned %></b><br />
+		Berat: <b><%= object.quantity_returned_weight %></b>
+		<hr />
+		Hilang: 	<b><%= object.quantity_lost %></b>
+		
+		<hr />
+		<%= link_to edit_post_delivery_delivery_entry_url(  object,:details => details), 
+			:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
+			<i class='icon-edit'></i> Isi Hasil Pengiriman
+		<% end %>
+	</td>
+	 
+  
+	<td>
+		<%= link_to delete_delivery_entry_url(:details => details), :class =>"delete_entry", 
+			:style => "cursor:pointer; text-decoration:none;" do %>
+			<i class='icon-remove'></i>Delete
+		<% end %> 
+	</td>
+	 
+	
+</tr>
