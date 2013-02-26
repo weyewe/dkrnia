@@ -25,6 +25,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
   # or the purchase_order_entry 's quantity is changed 
   def update_fulfillment_status
     if self.is_confirmed? 
+      self.reload
       fulfilled = self.purchase_receival_entries.where(:is_confirmed => true).sum("quantity")
       if fulfilled >= self.quantity
         self.is_fulfilled = true 
@@ -48,22 +49,22 @@ class PurchaseOrderEntry < ActiveRecord::Base
      
   def delete(employee)
     return nil if employee.nil?
-    # if self.is_confirmed?   
-    #   ActiveRecord::Base.transaction do
-    #     self.post_confirm_delete( employee )  
-    #     return self
-    #   end
-    # end
+    if self.is_confirmed?   
+      ActiveRecord::Base.transaction do
+        self.post_confirm_delete( employee )  
+        return self
+      end
+    end
     
     self.destroy 
   end
   
-  def post_confirm_delete( employee)  
-    # if there has been receival, can't be destroyed. 
-    self.purchase_receival_entries.each do |x|
-      x.delete( employee )  
-    end
-    
+  def post_confirm_delete( employee) 
+    if self.purchase_receival_entries.count != 0 
+      self.errors.add(:generic_error , "Sudah ada penerimaan barang" )
+      return self
+    end 
+ 
     self.destroy 
   end
   
@@ -88,12 +89,12 @@ class PurchaseOrderEntry < ActiveRecord::Base
   end
   
   def update_by_employee( employee, params ) 
-    # if self.is_confirmed? 
-    #   ActiveRecord::Base.transaction do
-    #     self.post_confirm_update( employee, params) 
-    #     return self  
-    #   end
-    # end
+    if self.is_confirmed? 
+      ActiveRecord::Base.transaction do
+        self.post_confirm_update( employee, params) 
+        return self  
+      end
+    end
     
     self.quantity    = params[:quantity]       
     self.item_id     = params[:item_id]
@@ -105,8 +106,36 @@ class PurchaseOrderEntry < ActiveRecord::Base
   
   
   def post_confirm_update(employee, params)
-    # if item is changed  
-    # if quantity is changed 
+    is_item_changed = false
+    is_quantity_changed = false 
+    
+    if params[:item_id] != self.item_id
+      is_item_changed = true
+    end
+    
+    if params[:item_id] == self.item_id and 
+        params[:quantity] != self.quantity 
+      is_quantity_changed = true 
+    end
+    
+    if is_item_changed
+      if self.purchase_receival_entries.count != 0 
+        self.errors.add(:item_id , "Sudah ada penerimaan barang" )
+        return self 
+      end
+      
+      old_item = self.item
+      self.item_id = params[:item_id]
+      self.quantity = params[:quantity]
+      self.save
+      self.reload
+      old_item.update_pending_receival
+    end
+    
+    if is_quantity_changed
+      self.quantity = params[:quantity]
+      self.save
+    end
   end
   
   

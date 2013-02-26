@@ -81,10 +81,9 @@ class DeliveryEntry < ActiveRecord::Base
   def post_confirm_delete( employee)  
     # if there is stock_usage_entry.. refresh => dispatch to other available shite 
     # stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-    stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
     
     # stock_entry.destroy 
-    stock_mutation.destroy 
+    self.destroy_stock_mutations
     self.destroy 
   end
   
@@ -125,30 +124,39 @@ class DeliveryEntry < ActiveRecord::Base
   
   def post_confirm_update(employee, params)
     old_item = self.item 
-    if not params[:item_id].nil? and params[:item_id] != self.item_id
-      old_item = self.item
-      new_item = Item.find_by_id params[:item_id]
+    is_item_changed = false
+    is_quantity_changed = false 
+    
+    if params[:item_id] != self.item_id 
+      is_item_changed = true
+    end
+    
+    if params[:item_id] == self.item_id
+      is_quantity_changed = true 
+    end
+    
+    
+    if is_item_changed
+      old_item = self.item 
       
-      # update and destroy the stock usage  (old item)
-      # recover stock entry 
-      # update and destroy stock mutation  
       self.item_id = params[:item_id]
-      self.quantity_sent = params[:quantity_sent]
-      # create the stock usage and stock entry on the new item 
-      # StockEntryUsage.generate_delivery_stock_entry_usage( self ) 
-      # doesn't matter if it is not sequential
-      # StockMutation.generate_delivery_stock_mutation( self )
+      self.quantity_sent = params[:quantity_sent] 
       self.save
       
     end
     
-    if params[:item_id] == self.item_id and 
-        self.quantity_sent != params[:quantity_sent]
-      # only changing the quantity 
+    if is_quantity_changed 
       self.quantity_sent     = params[:quantity_sent]
       self.save
-       
     end 
+    
+    
+    confirmed_delivery_stock_mutation.update_delivered_quantity( self )  if not self.confirmed_delivery_stock_mutation.nil?
+    
+    if is_item_changed
+      old_item.update_ready_quantity
+    end
+    # update stock mutation
   end
   
   def generate_code
@@ -184,13 +192,14 @@ class DeliveryEntry < ActiveRecord::Base
    
   def confirm
     return nil if self.is_confirmed == true 
-    self.is_confirmed = true 
-    self.save
-    self.reload 
+    ActiveRecord::Base.transaction do
+      self.is_confirmed = true 
+      self.save
+      self.reload 
+
+      self.update_delivery_stock_mutations
+    end
     
-    # create  stock_entry and the associated stock mutation 
-    # StockEntryUsage.generate_delivery_stock_entry_usage( self ) 
-    StockMutation.generate_delivery_stock_mutation( self ) 
   end
   
   
@@ -270,14 +279,36 @@ class DeliveryEntry < ActiveRecord::Base
       raise ActiveRecord::Rollback, "Call tech support!" 
     end
     
+    ActiveRecord::Base.transaction do
+      self.is_finalized = true 
+      self.save 
+      self.update_delivery_stock_mutations 
+    end
+  end
+  
+=begin
+  What if some numbers need to be adjusted after the delivery? 
+=end
+
+  def post_finalize_update( employee, params ) 
+    return nil if employee.nil? 
     
+    self.quantity_sent      = params[:quantity_sent]
+    self.quantity_confirmed = params[:quantity_confirmed]
+    self.quantity_returned  = params[:quantity_returned]
+    self.quantity_lost      = params[:quantity_lost]
+    self.validate_post_delivery_update
     
-    self.is_finalized = true 
-    self.save 
-    
-    StockMutation.create_delivery_return_stock_mutation( self ) 
-    StockMutation.create_delivery_lost_stock_mutation( self ) 
-    # StockEntryUsage.update_delivery_finalization_stock_entry_usage( self ) 
+    return self if  self.errors.size != 0 
+    self.save  
+    self.update_delivery_stock_mutations 
+    return self  
+  end
+
+  def update_delivery_stock_mutations
+    StockMutation.create_or_update_delivery_stock_mutation( self ) 
+    StockMutation.create_or_update_delivery_return_stock_mutation( self ) 
+    StockMutation.create_or_update_delivery_lost_stock_mutation( self )
   end
   
   def stock_entry_usages
@@ -287,6 +318,13 @@ class DeliveryEntry < ActiveRecord::Base
       :case => STOCK_ENTRY_USAGE[:delivery]  
     )
   end
+  
+  def destroy_stock_mutations
+    StockMutation.where(
+      :source_document_entry_id => self.id,
+      :source_document_entry => self.class.to_s  
+    ).each {|x| x.destroy }
+  end
    
   def delivery_return_stock_mutation
     StockMutation.where(
@@ -295,6 +333,15 @@ class DeliveryEntry < ActiveRecord::Base
       :mutation_case => MUTATION_CASE[:delivery_returned],
       :mutation_status => MUTATION_STATUS[:addition]
     ).first 
+  end
+  
+  def confirmed_delivery_stock_mutation
+    StockMutation.where(
+      :source_document_entry_id => self.id,
+      :source_document_entry => self.class.to_s ,
+      :mutation_case => MUTATION_CASE[:delivery],
+      :mutation_status => MUTATION_STATUS[:deduction]
+    ).first
   end
   
   def delivery_lost_stock_mutation

@@ -99,11 +99,11 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   
   def post_confirm_delete( employee)  
     # if there is stock_usage_entry.. refresh => dispatch to other available shite 
-    stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-    stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
+    # stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+    # stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
     
-    stock_entry.destroy 
-    stock_mutation.destroy 
+    # stock_entry.destroy 
+    stock_mutation.destroy if not stock_mutation.nil?
     self.destroy 
   end
   
@@ -133,8 +133,10 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   def update_by_employee( employee, params ) 
     if self.is_confirmed? 
       # later on, put authorization 
-      self.post_confirm_update( employee, params) 
-      return self 
+      ActiveRecord::Base.transaction do
+        self.post_confirm_update( employee, params) 
+        return self
+      end 
     end
 
     purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]    
@@ -151,34 +153,33 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]
     old_purchase_order_entry = self.purchase_order_entry
     
+    is_item_changed = false
+    is_quantity_changed = false
     
-    
-    if params[:purchase_order_entry_id] != self.purchase_order_entry_id
-      self.purchase_order_entry_id = params[:purchase_order_entry_id]
-      self.quantity                = 0 
-      self.item_id                 = purchase_order_entry.item_id
-      self.save
-      
-      # we need to shift the stock_usage_entry from the associated stock entry to somewhere else
-      # then, after shifting, we can re-point the data 
-      stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-      stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
-      
-      # use the original quantity 
-      self.quantity = params[:quantity]
-      self.save
-      stock_entry.purchase_receival_change_item( self )
-      stock_mutation.purchase_receival_change_item( self )  
+    if params[:purchase_order_id] != self.purchase_order_entry_id
+      is_item_changed = true 
     end
     
-    if self.quantity != params[:quantity]
-      # only changing the quantity 
+    if params[:purchase_order_id] == self.purchase_order_entry_id and 
+        params[:quantity] != self.quantity
+      is_quantity_changed = true 
+    end
+    
+    if  is_item_changed
+      self.purchase_order_entry_id = params[:purchase_order_entry_id]
+      self.item_id                 = purchase_order_entry.item_id
       self.quantity                = params[:quantity]
       self.save
-      
-      stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-      stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
+      # stock_entry.purchase_receival_change_item( self )
     end
+    
+    if is_quantity_changed
+      self.quantity                = params[:quantity]
+      self.save
+    end
+    
+    
+    stock_mutation.purchase_receival_change_item( self )  if not self.stock_mutation.nil?
     
     if purchase_order_entry.id != old_purchase_order_entry.id 
       old_purchase_order_entry.update_fulfillment_status

@@ -261,7 +261,7 @@ describe Delivery do
       
       # Contracting the stock entry usage. 
       
-      context "finalizing the delivery entry: with lost" do
+      context "finalizing the delivery entry: with return" do
         before(:each) do
           @quantity_returned = 1 
           @delivery_entry.update_post_delivery( @admin, {
@@ -296,71 +296,61 @@ describe Delivery do
             @delivery_entry.reload
             @delivery.reload
             @test_item.reload
-            # @stock_entry_usage = @delivery_entry.stock_entry_usages.first
-            # @initial_quantity_used = @stock_entry_usage.quantity
-            # @stock_entry = @stock_entry_usage.stock_entry
-            # @stock_entry_used_quantity = @stock_entry.used_quantity
-            # puts "initial @stock_entry.used_quantity = #{@stock_entry.used_quantity}"
-            
             @pre_finalization_ready = @test_item.ready 
             @delivery.finalize(@admin)
             @delivery_entry.reload 
             @delivery.reload 
-            # @stock_entry_usage.reload 
-            # @stock_entry.reload 
-            # puts "final @stock_entry.used_quantity = #{@stock_entry.used_quantity}"
             @test_item.reload 
           end
           
           it 'should produce diff in ready item, equal to the number of returned goods' do
             @final_ready_item = @test_item.ready
             diff =  @final_ready_item  - @pre_finalization_ready 
+            puts "quantity_sent: #{@delivery_entry.quantity_sent}"
+            puts "quantity_confirmed: #{@delivery_entry.quantity_confirmed}"
+            puts "quantity_returned: #{@delivery_entry.quantity_returned}"
+            puts "quantity_lost: #{@delivery_entry.quantity_lost}"
             diff.should == @quantity_returned
           end
           
+          it 'should reduce the stock mutation for delivery' do
+            @delivery_entry.confirmed_delivery_stock_mutation.quantity.should == @delivery_entry.quantity_sent
+          end
+          
+          it 'should create delivery return stock mutation' do
+            @delivery_entry.delivery_return_stock_mutation.quantity.should == @quantity_returned
+          end
+          
           it 'should finalize the delivery' do
-            @delivery.is_finalized.should be_true 
-          end
-          
-          it 'should preserve the data inside the delivery_entry' do
-            @delivery_entry.reload
-            @delivery_entry.quantity_confirmed.should == @quantity_sent -  @quantity_returned
-            @delivery_entry.quantity_returned.should == @quantity_returned
-            @delivery_entry.quantity_lost.should == 0
-          end
-          
-          it 'should update the ready quantity using the finalized quantity' do
-            @delivery_entry.errors.messages.each do |msg|
-              puts "The message is : #{msg}"
-            end
-            @delivery_entry.is_finalized.should be_true 
-          end
-          
-          it 'should not create return stock mutation' do
-            @delivery_entry.delivery_return_stock_mutation.should be_valid 
-          end
-          
-          it 'should not create lost stock mutation' do
-            @delivery_entry.delivery_lost_stock_mutation.should be_nil 
-          end
-          
-          # it 'should reduce the quantity used in stock_entry_usage' do
-          #   @final_quantity_used = @stock_entry_usage.quantity
-          #   diff = @initial_quantity_used - @final_quantity_used 
-          #   diff.should == @quantity_returned
-          # end
-          
-          # it 'should reduce the used quantity in the stock entry ' do
-          #   @final_stock_entry_used_quantity = @stock_entry.used_quantity
-          #   diff = @stock_entry_used_quantity - @final_stock_entry_used_quantity
-          #   diff.should == @quantity_returned 
-          # end
+             @delivery.is_finalized.should be_true 
+           end
+           
+           it 'should preserve the data inside the delivery_entry' do
+             @delivery_entry.reload
+             @delivery_entry.quantity_confirmed.should == @quantity_sent -  @quantity_returned
+             @delivery_entry.quantity_returned.should == @quantity_returned
+             @delivery_entry.quantity_lost.should == 0
+           end
+           
+           it 'should update the ready quantity using the finalized quantity' do
+             @delivery_entry.errors.messages.each do |msg|
+               puts "The message is : #{msg}"
+             end
+             @delivery_entry.is_finalized.should be_true 
+           end
+           
+           it 'should not create return stock mutation' do
+             @delivery_entry.delivery_return_stock_mutation.should be_valid 
+           end
+           
+           it 'should not create lost stock mutation' do
+             @delivery_entry.delivery_lost_stock_mutation.should be_nil 
+           end
         end
-        
       end
 
       
-      context "finalizing the delivery entry: with returned" do
+      context "finalizing the delivery entry: with lost" do
         before(:each) do
           @quantity_lost = 1 
           @delivery_entry.update_post_delivery( @admin, {

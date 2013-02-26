@@ -1,37 +1,39 @@
-Total flow:
-1. Employee
-2. Item Category
-3. Item 
-4. Stock Migration  => Update (always update)   [OK] (code base is ready, pending rspec)
-5. Stock Adjustment  =>  Always create ( no update )   [ok code base is ready]
+PurchaseOrder -> PurchaseReceival -> Delivery 
 
-6. Purchase Order	
-	=> Update/Delete => post confirm (will only deduct the pending receival) 
-	# on update: if the final pending receival < received item.. fuck it.. error 
-	# on delete: if there is any receival => fuck it.  But then again, this is corner cases.
-	And we assume that it is the admin that is doing the work. We should not be kept responsible. 
-	# anyhow, they can always use the stock adjustment. 
-	Just allow it to happen => always admin responsibility 
-	
-	=> Change Item being ordered => no problemo, if there is no receival
-	# update the pending receival status for target item and source item 
-	
-7. Purchase Receival 	=> update/delete => + post confirm 
-	# update : if it causes the ready to be less than 0 => error
-	
-	# the delete , post confirm update is done as well.  :update_fulfillment_status
-	# if it is larger than the quantity specified in purchase order => error 
+if purchase_order is deleted, what will happen?
+Delete pre condition: 
+1. It can be deleted if there is no purchase receival
+2. If there is purchase receival, delete the purchase receival first. 
 
-8. Delivery to customer / usage, or whatever.   => update/delete post confirm / post finalize 
-	# 1. change the quantity sent => just do it .. and i won't check the integrity 
-	# 2. change the quantity returned + lost + confirmed => nothing to do with the backend 
-			# will still check the integrity 
-			
-			# DONE ! fuck yeah.. print the delivery receipt  + report 
+Update cases: item change or quantity change 
+On item change:
+1. if there is purchase receival, don't allow 
+2. If it is allowed => refresh the pending receival for both old and new item 
 
-  
-# use this simple steps => move on to the Ext JS full fledged :) 
+On quantity change
+=> refresh the pending receival 
+
+Post Condition:
+1. Change the 
 
 
-DO RSPEC for update on purchase order, purchase receival and finally delivery 
-# delivery post finalization => copy the one in supermetal. 
+PURCHASE_RECEIVAL
+Delete pre condition:
+1. no condition. up to you. Even if the final result is minus 
+
+Update pre condition: 
+1. If change item => re point the stock mutation
+2. If change quantity => change the quantity 
+
+
+DELIVERY
+Delete pre condition:
+1. up to you. Just delete. it will update the ready quantity accordingly
+
+Update pre condition: 
+1. If change item => repoint the stock mutation
+2. If change quantity => adjust the  stock mutation
+
+
+There must be better solution to this update/delete. happening just 20% of the time
+But, takes 80% of the cost. 
