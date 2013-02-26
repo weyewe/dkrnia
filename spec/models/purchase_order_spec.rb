@@ -46,6 +46,13 @@ describe PurchaseOrder do
       :customer_code => 'CCCL222',
       :item_category_id => @base_item_category.id 
     })
+    
+    @second_test_item  = Item.create_by_employee(  @admin,  {
+      :name => "Second Test Item",
+      :supplier_code => "BEL3224234423224324",
+      :customer_code => 'CCCL22343222',
+      :item_category_id => @base_item_category.id 
+    })
 
 
     # create stock migration
@@ -54,6 +61,11 @@ describe PurchaseOrder do
       :item_id => @test_item.id,
       :quantity => @migration_quantity
     })  
+    
+    @second_test_item_migration  = StockMigration.create_by_employee(@admin, {
+      :item_id => @second_test_item.id,
+      :quantity => 10
+    })
  
     @test_item.reload 
   end
@@ -128,41 +140,14 @@ describe PurchaseOrder do
          @purchase_order.is_confirmed.should be_true 
        end
        
+       it 'should confirm the purchase order entry' do
+         @purchase_order_entry.reload 
+         @purchase_order_entry.is_confirmed.should be_true
+       end
+       
        it 'should change the number of pending_receival' do
          diff = @post_confirm_pending_receival - @pre_confirm_pending_receival
          diff.should == @quantity_purchased
-       end
-       
-       context "post confirm update" do
-         before(:each) do
-           @update_quantity = 9
-           @test_item.reload 
-           @pre_update_pending_receival = @test_item.pending_receival
-           @purchase_order_entry.update_by_employee(@admin, {
-             :quantity => @update_quantity,
-             :item_id => @test_item.id 
-           })
-           @test_item.reload 
-         end
-         
-         it 'should alter the item#pending_receival' do
-           @test_item.pending_receival.should == @update_quantity
-         end
-         
-       end
-       
-       context "post confirm delete " do 
-         before(:each) do
-           @update_quantity = 9
-           @test_item.reload 
-           @pre_update_pending_receival = @test_item.pending_receival
-           @purchase_order_entry.delete(@admin )
-           @test_item.reload 
-         end
-         
-         it 'should alter the item#pending_receival' do
-           @test_item.pending_receival.should == 0 
-         end
        end
      end
    end

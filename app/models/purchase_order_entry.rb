@@ -18,7 +18,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
    
   # validate :quantity_must_not_less_than_zero 
   
-  after_save :update_item_pending_receival, :update_fulfillment_status
+  after_save :update_item_pending_receival  
   after_destroy :update_item_pending_receival 
   
   # this is called when there is change in the purchase_receival_entry#purchase_order_entry
@@ -29,6 +29,9 @@ class PurchaseOrderEntry < ActiveRecord::Base
       fulfilled = self.purchase_receival_entries.where(:is_confirmed => true).sum("quantity")
       if fulfilled >= self.quantity
         self.is_fulfilled = true 
+        self.save 
+      else
+        self.is_fulfilled = false
         self.save 
       end
     end
@@ -106,15 +109,18 @@ class PurchaseOrderEntry < ActiveRecord::Base
   
   
   def post_confirm_update(employee, params)
+    # puts "\n\n Inside post_confirm_update\n\n"
     is_item_changed = false
     is_quantity_changed = false 
     
     if params[:item_id] != self.item_id
       is_item_changed = true
+      puts "The item is changed"
     end
     
     if params[:item_id] == self.item_id and 
         params[:quantity] != self.quantity 
+        puts "The quantity is changed"
       is_quantity_changed = true 
     end
     
@@ -129,6 +135,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
       self.quantity = params[:quantity]
       self.save
       self.reload
+      # puts "Gonna update the old item in post confirm update\n"*10
       old_item.update_pending_receival
     end
     
@@ -136,6 +143,8 @@ class PurchaseOrderEntry < ActiveRecord::Base
       self.quantity = params[:quantity]
       self.save
     end
+    
+    self.update_fulfillment_status
   end
   
   

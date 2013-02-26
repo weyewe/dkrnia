@@ -232,7 +232,7 @@ describe Delivery do
           @delivery_entry.quantity_lost.should == 0 
           
           
-          puts "3325The end result:\n"*20
+          # puts "3325The end result:\n"*20
         end
         
         context "finalize delivery" do
