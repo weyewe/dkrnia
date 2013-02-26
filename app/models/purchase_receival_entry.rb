@@ -23,9 +23,9 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   after_destroy :update_item_pending_receival , :update_purchase_order_entry_fulfilment_status, :update_item_statistics
   
   def update_item_pending_receival
-    puts "inside the update item pending receival"
+    # puts "inside the update item pending receival"
     return nil if not self.is_confirmed? 
-    puts "Gonna execute update item pending receival"
+    # puts "Gonna execute update item pending receival"
     item = self.item 
     item.reload 
     item.update_pending_receival

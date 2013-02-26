@@ -47,6 +47,12 @@ describe Delivery do
       :item_category_id => @base_item_category.id 
     })
 
+    @second_test_item  = Item.create_by_employee(  @admin,  {
+      :name => "Second Test Item",
+      :supplier_code => "BEL3224234423224324",
+      :customer_code => 'CCCL22343222',
+      :item_category_id => @base_item_category.id 
+    })
 
     # create stock migration
     @migration_quantity = 200 
@@ -54,6 +60,11 @@ describe Delivery do
       :item_id => @test_item.id,
       :quantity => @migration_quantity
     })  
+    
+    @second_test_item_migration  = StockMigration.create_by_employee(@admin, {
+      :item_id => @second_test_item.id,
+      :quantity => 10
+    })
  
     @test_item.reload 
     
@@ -194,21 +205,82 @@ describe Delivery do
       end
       
       
-      # it 'should create stock entry usage' do
-      #   StockEntryUsage.where(
-      #     :source_document_entry_id => @delivery_entry.id,
-      #     :source_document_entry => @delivery_entry.class.to_s
-      #   ).count.should_not == 0 
-      # end
+      context 'post confirm update: item and quantity' do
+        before(:each) do
+          @delivery_entry.reload
+          @new_quantity = 5
+          @quantity_sent = @delivery_entry.quantity_sent  
+          @test_item.reload
+          @second_test_item.reload 
+          @initial_first_ready_item = @test_item.ready 
+          @initial_second_ready_item = @second_test_item.ready
+          @delivery_entry.post_confirm_update( @admin, {
+            :item_id => @second_test_item.id,
+            :quantity_sent => @new_quantity 
+          })
+          @delivery_entry.reload 
+          @second_test_item.reload 
+          @test_item.reload 
+        end
+        
+        it 'should have no error' do
+          @delivery_entry.errors.messages.each do |msg|
+            puts "The MSG: #{msg}"
+          end
+          @delivery_entry.errors.size.should == 0 
+        end
+        
+        it 'should update the stock mutation and quantity sent' do
+          @delivery_entry.confirmed_delivery_stock_mutation.quantity.should == @new_quantity
+        end
+        
+        
+        it 'should change the quantity_sent' do
+          @delivery_entry.quantity_sent = @new_quantity
+        end
+        
+        it 'should add the first_test_item by quantity_sent' do
+          
+          puts "quantity sent: #{@quantity_sent}"
+          @final_first_ready_item = @test_item.ready
+          puts "initial first ready item: #{@initial_first_ready_item}"
+          puts "final first ready item: #{@final_first_ready_item}"
+          
+          puts "initial second ready_item: #{@initial_second_ready_item}"
+          puts "final second ready_item: #{@second_test_item.ready}"
+          diff = @final_first_ready_item - @initial_first_ready_item
+          diff.should == @quantity_sent 
+        end
+        
+        it 'should deduct the second_test_item by new_quantity' do
+          @final_second_ready_item = @second_test_item.ready 
+          diff = @initial_second_ready_item - @final_second_ready_item
+          diff.should == @new_quantity
+        end
+      end
       
-      # it 'should create several stock entry usages whose sum is equal to the quantity sent' do
-      #   StockEntryUsage.where(
-      #     :source_document_entry_id => @delivery_entry.id,
-      #     :source_document_entry => @delivery_entry.class.to_s
-      #   ).sum("quantity").should == @delivery_entry.quantity_sent 
-      # end
-      
-   
+      context 'post confirm delete' do
+        before(:each) do
+          @test_item.reload
+          @initial_item_ready = @test_item.ready
+          @quantity_sent = @delivery_entry.quantity_sent 
+          @delivery_entry.delete(@admin)
+          @test_item.reload
+        end
+        
+        it 'should delete the delivery stock mutation' do
+          StockMutation.where(
+            :source_document_entry_id => @delivery_entry.id,
+            :source_document_entry => @delivery_entry.class.to_s 
+          ).count.should == 0 
+        end
+        
+        it 'should recover the item ready quantity' do
+          @final_item_ready = @test_item.ready
+          diff = @final_item_ready - @initial_item_ready
+          diff = @quantity_sent 
+        end
+      end
       
       context "finalizing the delivery entry: no lost or returned" do
         before(:each) do
@@ -217,9 +289,6 @@ describe Delivery do
             :quantity_returned => 0,  # create stock mutation
             :quantity_lost =>  0  # create stock mutation 
             } ) 
-            
-          # @delivery.finalize(@admin)
-          # @delivery_entry.reload 
         end
         
         it 'should be able to update post dleivery' do
@@ -230,9 +299,6 @@ describe Delivery do
           @delivery_entry.quantity_confirmed.should == @quantity_sent
           @delivery_entry.quantity_returned.should == 0 
           @delivery_entry.quantity_lost.should == 0 
-          
-          
-          # puts "3325The end result:\n"*20
         end
         
         context "finalize delivery" do
@@ -254,12 +320,56 @@ describe Delivery do
             @delivery_entry.delivery_lost_stock_mutation.should be_nil 
           end
           
+          context "post finalize update" do
+            before(:each) do
+              
+              @new_quantity_sent = @quantity_sent +1  
+              @new_quantity_confirmed = @quantity_sent -1 
+              @new_quantity_returned = 1 
+              @new_quantity_lost = 1 
+              @test_item.reload 
+              @initial_item_ready = @test_item.ready 
+              @delivery_entry.reload 
+              @delivery_entry.update_post_delivery( @admin, {
+                :quantity_sent =>  @new_quantity_sent,
+                :quantity_confirmed =>  @new_quantity_confirmed ,
+                :quantity_returned => @new_quantity_returned ,
+                :quantity_lost =>  @new_quantity_lost
+              } ) 
+              @delivery_entry.reload 
+              @test_item.reload  
+            end
+            
+            it 'should create valid delivery entry' do
+              @delivery_entry.errors.size.should == 0 
+            end
+            
+            it 'should update the stock mutation' do
+              @delivery_entry.delivery_lost_stock_mutation.quantity.should == @new_quantity_lost
+              @delivery_entry.confirmed_delivery_stock_mutation.quantity.should == @new_quantity_sent
+              @delivery_entry.delivery_return_stock_mutation.quantity.should == @new_quantity_returned
+            end
+          end
+          
+          context "post finalize delete" do
+            before(:each) do
+              @test_item.reload
+              @initial_item_ready = @test_item.ready 
+              @quantity_sent = @delivery_entry.quantity_sent 
+              @delivery_entry.reload 
+              @delivery_entry.delete(@admin)
+              @test_item.reload 
+            end
+           
+            it 'should update the ready item' do
+              @final_item_ready = @test_item.ready 
+              diff = @final_item_ready - @initial_item_ready
+              diff.should == @quantity_sent 
+            end
+          end
          
         end
       end
-            
-      
-      # Contracting the stock entry usage. 
       
       context "finalizing the delivery entry: with return" do
         before(:each) do
@@ -348,7 +458,7 @@ describe Delivery do
            end
         end
       end
-
+      
       
       context "finalizing the delivery entry: with lost" do
         before(:each) do

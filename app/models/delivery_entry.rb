@@ -61,14 +61,14 @@ class DeliveryEntry < ActiveRecord::Base
  
     if not self.persisted? and delivery_entry_count != 0
       errors.add(:item_id , msg ) 
-    elsif self.persisted? and delivery_entry_count != 1 
+    elsif self.persisted? and delivery_entry_count > 1 
       errors.add(:item_id , msg ) 
     end
   end
      
   def delete(employee)
     return nil if employee.nil?
-    if self.is_confirmed?  
+    if self.is_confirmed?   # the same thing if it is post finalized
       ActiveRecord::Base.transaction do
         self.post_confirm_delete( employee)  
         return self
@@ -113,11 +113,15 @@ class DeliveryEntry < ActiveRecord::Base
         self.post_confirm_update( employee, params) 
         return self 
       end
+    elsif self.is_confirmed? and self.is_finalized?
+     ActiveRecord::Base.transaction do
+       self.post_finalize_update( employee, params) 
+       return self 
+     end
     end
 
-    self.quantity_sent                = params[:quantity_sent]       
-    self.item_id                 = params[:item_id]
- 
+    self.quantity_sent = params[:quantity_sent]       
+    self.item_id       = params[:item_id]
     self.save 
     return self 
   end
@@ -131,30 +135,35 @@ class DeliveryEntry < ActiveRecord::Base
       is_item_changed = true
     end
     
-    if params[:item_id] == self.item_id
+    if params[:item_id] == self.item_id and   
+        self.quantity_sent != params[:quantity_sent]
       is_quantity_changed = true 
     end
     
     
     if is_item_changed
-      old_item = self.item 
-      
+      puts "773 THE ITEM IS CHANGED"      
       self.item_id = params[:item_id]
       self.quantity_sent = params[:quantity_sent] 
       self.save
-      
     end
     
     if is_quantity_changed 
+      puts "8824 the quantity is changed "
       self.quantity_sent     = params[:quantity_sent]
       self.save
     end 
     
     
-    confirmed_delivery_stock_mutation.update_delivered_quantity( self )  if not self.confirmed_delivery_stock_mutation.nil?
-    
+    # confirmed_delivery_stock_mutation.update_delivered_quantity( self )  if not self.confirmed_delivery_stock_mutation.nil?
+    puts "The old item_id => #{old_item.id}"
+    puts "The new item_id => #{self.item_id}"
+    StockMutation.create_or_update_delivery_stock_mutation( self ) 
     if is_item_changed
+      old_item.reload
+      self.reload
       old_item.update_ready_quantity
+      self.item.update_ready_quantity
     end
     # update stock mutation
   end
@@ -198,6 +207,7 @@ class DeliveryEntry < ActiveRecord::Base
       self.reload 
 
       self.update_delivery_stock_mutations
+      
     end
     
   end

@@ -13,6 +13,7 @@ class StockMutation < ActiveRecord::Base
    
 
   def update_item_statistics
+    self.reload 
     item.update_ready_quantity
   end
   
@@ -116,12 +117,15 @@ class StockMutation < ActiveRecord::Base
       new_object.save 
     else
       past_object.quantity = delivery_entry.quantity_sent
+      past_object.item_id = delivery_entry.item_id 
      
       past_object.save 
     end
   end
   
   def self.create_or_update_delivery_return_stock_mutation( delivery_entry ) 
+    return nil if not delivery_entry.is_finalized?
+    
     past_object = self.where(
       :source_document_entry => delivery_entry.class.to_s,
       :source_document_entry_id => delivery_entry.id,
@@ -144,6 +148,7 @@ class StockMutation < ActiveRecord::Base
     elsif not past_object.nil? and delivery_entry.quantity_returned !=  0
      
       past_object.quantity  = delivery_entry.quantity_returned
+      past_object.item_id = delivery_entry.item_id 
       past_object.save 
     elsif not past_object.nil? and delivery_entry.quantity_returned ==  0
       past_object.destroy 
@@ -152,14 +157,15 @@ class StockMutation < ActiveRecord::Base
    
  
   def self.create_or_update_delivery_lost_stock_mutation( delivery_entry ) 
-   past_object = self.where(
+    return nil if not delivery_entry.is_finalized?
+    past_object = self.where(
      :source_document_entry => delivery_entry.class.to_s,
      :source_document_entry_id => delivery_entry.id,
      :mutation_case => MUTATION_CASE[:delivery_lost],
      :mutation_status => MUTATION_STATUS[:deduction]
-   ).first 
+    ).first 
 
-   if past_object.nil? and delivery_entry.quantity_lost != 0 
+    if past_object.nil? and delivery_entry.quantity_lost != 0 
      new_object = self.new
      new_object.creator_id               = delivery_entry.delivery.creator_id
      new_object.quantity                 = delivery_entry.quantity_lost
@@ -171,13 +177,14 @@ class StockMutation < ActiveRecord::Base
      new_object.mutation_case            = MUTATION_CASE[:delivery_lost] 
      new_object.mutation_status          = MUTATION_STATUS[:deduction]
      new_object.save 
-   elsif not past_object.nil? and delivery_entry.quantity_lost !=  0
+    elsif not past_object.nil? and delivery_entry.quantity_lost !=  0
 
      past_object.quantity = delivery_entry.quantity_lost
+     past_object.item_id = delivery_entry.item_id 
      past_object.save 
-   elsif not past_object.nil? and delivery_entry.quantity_lost ==  0
+    elsif not past_object.nil? and delivery_entry.quantity_lost ==  0
      past_object.destroy 
-   end
+    end
   end
   
   def StockMutation.create_delivery_return_stock_mutation( delivery_entry  ) 
