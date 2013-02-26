@@ -46,6 +46,13 @@ describe PurchaseReceival do
       :customer_code => 'CCCL222',
       :item_category_id => @base_item_category.id 
     })
+    
+    @second_test_item  = Item.create_by_employee(  @admin,  {
+      :name => "Second Test Item",
+      :supplier_code => "BEL3224234423224324",
+      :customer_code => 'CCCL22343222',
+      :item_category_id => @base_item_category.id 
+    })
 
 
     # create stock migration
@@ -137,6 +144,23 @@ describe PurchaseReceival do
       diff = @initial_pending_receival - @final_pending_receival 
       diff.should == @diff 
     end
+  end
+  
+  context "[purchase_receival present] updating purchase order entry:  quantity + item" do
+    before(:each) do
+      @test_item.reload
+      @initial_pending_receival=  @test_item.pending_receival
+      @purchase_order_entry.update_by_employee(@admin, {
+         :quantity => @received_quantity ,
+         :item_id => @second_test_item.id 
+       })
+      @purchase_order_entry.reload
+      @test_item.reload
+    end
+    
+    it 'should be updated' do
+      @purchase_order_entry.errors.size.should_not == 0 
+    end 
   end
   
   context "[purchase_receival present] delete the purchase order entry" do

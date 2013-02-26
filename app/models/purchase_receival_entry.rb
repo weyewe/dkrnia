@@ -23,7 +23,9 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   after_destroy :update_item_pending_receival , :update_purchase_order_entry_fulfilment_status, :update_item_statistics
   
   def update_item_pending_receival
+    puts "inside the update item pending receival"
     return nil if not self.is_confirmed? 
+    puts "Gonna execute update item pending receival"
     item = self.item 
     item.reload 
     item.update_pending_receival
@@ -37,6 +39,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   end
   
   def update_purchase_order_entry_fulfilment_status
+    self.reload 
     purchase_order_entry = self.purchase_order_entry 
     purchase_order_entry.update_fulfillment_status
     # what if they change the purchase_order_entry
@@ -79,7 +82,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
  
     if not self.persisted? and purchase_receival_entry_count != 0
       errors.add(:purchase_order_entry_id , msg ) 
-    elsif self.persisted? and purchase_receival_entry_count != 1 
+    elsif self.persisted? and purchase_receival_entry_count > 1 
       errors.add(:purchase_order_entry_id , msg ) 
     end
   end
@@ -156,6 +159,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     is_item_changed = false
     is_quantity_changed = false
     
+    
     if params[:purchase_order_id] != self.purchase_order_entry_id
       is_item_changed = true 
     end
@@ -169,8 +173,12 @@ class PurchaseReceivalEntry < ActiveRecord::Base
       self.purchase_order_entry_id = params[:purchase_order_entry_id]
       self.item_id                 = purchase_order_entry.item_id
       self.quantity                = params[:quantity]
-      self.save
-      # stock_entry.purchase_receival_change_item( self )
+      purchase_receival_entry_count = PurchaseReceivalEntry.where(
+        :purchase_order_entry_id => self.purchase_order_entry_id,
+        :purchase_receival_id => self.purchase_receival.id  
+      ).count
+
+      self.save 
     end
     
     if is_quantity_changed
@@ -182,6 +190,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     stock_mutation.purchase_receival_change_item( self )  if not self.stock_mutation.nil?
     
     if purchase_order_entry.id != old_purchase_order_entry.id 
+      old_purchase_order_entry.reload 
       old_purchase_order_entry.update_fulfillment_status
     end
   end
