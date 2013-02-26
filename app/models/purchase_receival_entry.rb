@@ -39,8 +39,8 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   end
   
   def update_purchase_order_entry_fulfilment_status
-    self.reload 
     purchase_order_entry = self.purchase_order_entry 
+    purchase_order_entry.reload 
     purchase_order_entry.update_fulfillment_status
     # what if they change the purchase_order_entry
   end
@@ -101,12 +101,10 @@ class PurchaseReceivalEntry < ActiveRecord::Base
   end
   
   def post_confirm_delete( employee)  
-    # if there is stock_usage_entry.. refresh => dispatch to other available shite 
-    # stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-    # stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
-    
-    # stock_entry.destroy 
-    stock_mutation.destroy if not stock_mutation.nil?
+    StockMutation.where(
+      :source_document_entry_id => self.id,
+      :source_document_entry => self.class.to_s
+    ).each {|x| x.destroy }
     self.destroy 
   end
   

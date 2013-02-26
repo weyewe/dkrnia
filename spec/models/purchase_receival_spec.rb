@@ -211,78 +211,101 @@ describe PurchaseReceival do
           @test_item.reload
         end
         
-        it 'should confirm the purchase receival' do
-           @purchase_receival.is_confirmed.should be_true 
-         end
-         
-         it 'should confirm the purchase receival entry' do
-           @purchase_receival_entry.is_confirmed.should be_true 
-         end
-         
-         it 'should reduce the pending receival quantity' do
-           @final_pending_receival_quantity = @test_item.pending_receival
-           diff = @initial_pending_receival_quantity   - @final_pending_receival_quantity
-           diff.should == @received_quantity
-         end
-
-        it 'should increase the ready item' do
-          @final_ready_quantity = @test_item.ready
-          diff = @final_ready_quantity - @initial_ready_quantity
-          diff.should == @received_quantity
-        end
+        # it 'should confirm the purchase receival' do
+        #    @purchase_receival.is_confirmed.should be_true 
+        #  end
+        #  
+        #  it 'should confirm the purchase receival entry' do
+        #    @purchase_receival_entry.is_confirmed.should be_true 
+        #  end
+        #  
+        #  it 'should reduce the pending receival quantity' do
+        #    @final_pending_receival_quantity = @test_item.pending_receival
+        #    diff = @initial_pending_receival_quantity   - @final_pending_receival_quantity
+        #    diff.should == @received_quantity
+        #  end
+        # 
+        # it 'should increase the ready item' do
+        #   @final_ready_quantity = @test_item.ready
+        #   diff = @final_ready_quantity - @initial_ready_quantity
+        #   diff.should == @received_quantity
+        # end
+        # 
+        # it 'should have pending receival for the second item' do
+        #   @second_test_item.reload
+        #   @second_test_item.pending_receival.should == @second_quantity_purchased
+        # end
         
-        it 'should have pending receival for the second item' do
-          @second_test_item.reload
-          @second_test_item.pending_receival.should == @second_quantity_purchased
-        end
-        
-        
-        context "[post confirm purchase receive] change the purchase_order_entry" do
-          before(:each) do
-            @second_diff = 1
-            @new_quantity = @second_quantity_purchased - @second_diff 
-            @purchase_receival_entry.reload
-            @test_item.reload
-            @second_test_item.reload
-            @first_item_initial_pending_receival = @test_item.pending_receival 
-            @initial_second_pending_receival = @second_test_item.pending_receival
-            @purchase_receival_entry.update_by_employee( @admin, {
-              :purchase_order_entry_id => @second_purchase_order_entry.id ,
-              :quantity => @new_quantity
-            } ) 
-            @test_item.reload
-            @second_test_item.reload
-          end
-          
-          # it 'should point to the new purchase order entry' do
-          #   @purchase_receival_entry.purchase_order_entry_id.should == @second_purchase_order_entry.id
-          #   @purchase_receival_entry.quantity.should ==  @new_quantity
-          # end
-          # 
-          # it 'should allow change of purchase order entry' do
-          #   @purchase_receival_entry.errors.size.should_not == 0 
-          # end
-          
-          it 'should consume the new purchase order entry' do
-            puts "initial second pending receival; #{@initial_second_pending_receival}"
-            
-            @final_second_pending_receival = @second_test_item.pending_receival
-            puts "final second pending receival: #{@final_second_pending_receival}"
-            puts "quantity assigned: #{@new_quantity}"
-            diff = @initial_second_pending_receival - @final_second_pending_receival
-            diff.should == @new_quantity 
-          end
-          
-          it 'should update the old item pending receival' do
-            @first_item_initial_pending_receival = @test_item.pending_receival 
-            @first_item_initial_pending_receival.should == @first_purchase_order_entry_quantity
-          end
-        end
-        
-        context "[post confirm purchase receive] change the purchase_order_entry and quantity" do
-        end
-        
+         #        
+         # context "[post confirm purchase receive] change the purchase_order_entry: item + quantity" do
+         #   before(:each) do
+         #     @second_diff = 1
+         #     @new_quantity = @second_quantity_purchased - @second_diff 
+         #     @purchase_receival_entry.reload
+         #     @test_item.reload
+         #     @second_test_item.reload
+         #     @first_item_initial_pending_receival = @test_item.pending_receival 
+         #     @initial_second_pending_receival = @second_test_item.pending_receival
+         #     @purchase_receival_entry.update_by_employee( @admin, {
+         #       :purchase_order_entry_id => @second_purchase_order_entry.id ,
+         #       :quantity => @new_quantity
+         #     } ) 
+         #     @test_item.reload
+         #     @second_test_item.reload
+         #   end
+         #   
+         #   it 'should point to the new purchase order entry' do
+         #     @purchase_receival_entry.purchase_order_entry_id.should == @second_purchase_order_entry.id
+         #     @purchase_receival_entry.quantity.should ==  @new_quantity
+         #   end
+         #   
+         #   it 'should allow change of purchase order entry' do
+         #     @purchase_receival_entry.errors.size.should == 0 
+         #   end
+         #   
+         #   it 'should consume the new purchase order entry' do
+         #     puts "initial second pending receival; #{@initial_second_pending_receival}"
+         #     
+         #     @final_second_pending_receival = @second_test_item.pending_receival
+         #     puts "final second pending receival: #{@final_second_pending_receival}"
+         #     puts "quantity assigned: #{@new_quantity}"
+         #     diff = @initial_second_pending_receival - @final_second_pending_receival
+         #     diff.should == @new_quantity 
+         #   end
+         #   
+         #   it 'should update the old item pending receival' do
+         #     @first_item_initial_pending_receival = @test_item.pending_receival 
+         #     @first_item_initial_pending_receival.should == @first_purchase_order_entry_quantity
+         #   end
+         # end
+         #         
+ 
         context "[post confirm purchase receive] delete" do
+          before(:each) do
+            @test_item.reload
+            @initial_ready_item = @test_item.ready 
+            @initial_pending_receival = @test_item.pending_receival 
+            @received_quantity = @purchase_receival_entry.quantity
+            @purchase_receival_entry.delete(@admin)
+            @test_item.reload
+          end
+          
+          # it 'should delete the receival' do
+          #   @purchase_receival_entry.persisted?.should be_false 
+          # end
+          
+          it 'should deduct item ready'  do
+            @final_ready_item = @test_item.ready 
+            diff = @initial_ready_item - @final_ready_item 
+            diff.should == @received_quantity
+          end
+          
+          
+          it 'should increase the pending receival' do
+            @final_pending_receival = @test_item.pending_receival
+            diff = @final_pending_receival - @initial_pending_receival
+            diff.should == @received_quantity
+          end
         end
         
       end 
