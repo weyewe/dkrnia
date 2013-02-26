@@ -45,19 +45,7 @@ class DeliveryEntry < ActiveRecord::Base
     end
   end
      
-  # def quantity_must_not_exceed_available_quantity
-  #   return nil if self.purchase_order_entry.nil? 
-  #   return nil if self.is_confirmed? 
-  #   
-  #  
-  #   received_quantity = purchase_order_entry.received_quantity
-  #   ordered_quantity = purchase_order_entry.quantity 
-  #   pending_receival = ordered_quantity - received_quantity
-  #   
-  #   if  self.quantity > pending_receival 
-  #     errors.add(:quantity , "Max penerimaan untuk item dari purchase order ini: #{pending_receival}" )
-  #   end
-  # end   
+ 
   
   def unique_item_entry
     return nil if self.item_id.nil? 
@@ -87,16 +75,15 @@ class DeliveryEntry < ActiveRecord::Base
       end 
     end
     
-    
     self.destroy 
   end
   
   def post_confirm_delete( employee)  
     # if there is stock_usage_entry.. refresh => dispatch to other available shite 
-    stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+    # stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
     stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
     
-    stock_entry.destroy 
+    # stock_entry.destroy 
     stock_mutation.destroy 
     self.destroy 
   end
@@ -122,10 +109,11 @@ class DeliveryEntry < ActiveRecord::Base
   end
   
   def update_by_employee( employee, params ) 
-    if self.is_confirmed? 
-      # later on, put authorization 
-      self.post_confirm_update( employee, params) 
-      return self 
+    if self.is_confirmed?  and not self.is_finalized? 
+      ActiveRecord::Base.transaction do
+        self.post_confirm_update( employee, params) 
+        return self 
+      end
     end
 
     self.quantity_sent                = params[:quantity_sent]       
@@ -135,43 +123,34 @@ class DeliveryEntry < ActiveRecord::Base
     return self 
   end
   
-  # def post_confirm_update(employee, params)
-  #   
-  #   purchase_order_entry = DeliveryEntry.find_by_id params[:purchase_order_entry_id]
-  #   old_purchase_order_entry = self.purchase_order_entry
-  #   
-  #   
-  #   
-  #   if params[:purchase_order_entry_id] != self.purchase_order_entry_id
-  #     self.purchase_order_entry_id = params[:purchase_order_entry_id]
-  #     self.quantity_sent                = 0 
-  #     self.item_id                 = purchase_order_entry.item_id
-  #     self.save
-  #     
-  #     # we need to shift the stock_usage_entry from the associated stock entry to somewhere else
-  #     # then, after shifting, we can re-point the data 
-  #     stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-  #     stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
-  #     
-  #     # use the original quantity 
-  #     self.quantity = params[:quantity]
-  #     self.save
-  #     stock_entry.delivery_change_item( self )
-  #     stock_mutation.delivery_change_item( self )  
-  #   else
-  #     # only changing the quantity 
-  #     self.quantity                = params[:quantity]
-  #     self.save
-  #     
-  #     stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
-  #     stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil?
-  #   end
-  #   
-  #   if purchase_order_entry.id != old_purchase_order_entry.id 
-  #     old_purchase_order_entry.update_fulfillment_status
-  #   end
-  # end
-  # 
+  def post_confirm_update(employee, params)
+    old_item = self.item 
+    if not params[:item_id].nil? and params[:item_id] != self.item_id
+      old_item = self.item
+      new_item = Item.find_by_id params[:item_id]
+      
+      # update and destroy the stock usage  (old item)
+      # recover stock entry 
+      # update and destroy stock mutation  
+      self.item_id = params[:item_id]
+      self.quantity_sent = params[:quantity_sent]
+      # create the stock usage and stock entry on the new item 
+      # StockEntryUsage.generate_delivery_stock_entry_usage( self ) 
+      # doesn't matter if it is not sequential
+      # StockMutation.generate_delivery_stock_mutation( self )
+      self.save
+      
+    end
+    
+    if params[:item_id] == self.item_id and 
+        self.quantity_sent != params[:quantity_sent]
+      # only changing the quantity 
+      self.quantity_sent     = params[:quantity_sent]
+      self.save
+       
+    end 
+  end
+  
   def generate_code
     start_datetime = Date.today.at_beginning_of_month.to_datetime
     end_datetime = Date.today.next_month.at_beginning_of_month.to_datetime
@@ -210,7 +189,7 @@ class DeliveryEntry < ActiveRecord::Base
     self.reload 
     
     # create  stock_entry and the associated stock mutation 
-    StockEntryUsage.generate_delivery_stock_entry_usage( self ) 
+    # StockEntryUsage.generate_delivery_stock_entry_usage( self ) 
     StockMutation.generate_delivery_stock_mutation( self ) 
   end
   
@@ -233,14 +212,6 @@ class DeliveryEntry < ActiveRecord::Base
   end
   
   def validate_post_delivery_total_sum
-    # puts "\n\nInside validate_post_delivery_total_sum"
-    # 
-    # puts "quantity_sent : #{self.quantity_sent}"
-    # puts "quantity_confirmed : #{ self.quantity_confirmed}"
-    # puts "quantity_returned : #{ self.quantity_returned}"
-    # puts "quantity_lost : #{ self.quantity_lost} "
-    # 
-    # puts "3333 done "
     if self.quantity_confirmed + self.quantity_returned + self.quantity_lost != self.quantity_sent 
       msg = "Jumlah yang terkirim: #{self.quantity_sent}. " +
               "Konfirmasi #{self.quantity_confirmed} + " + 
@@ -261,10 +232,12 @@ class DeliveryEntry < ActiveRecord::Base
     
   def update_post_delivery( employee, params ) 
     return nil if employee.nil? 
-    # if self.is_finalized?
-    #   self.post_finalize_update( employee, params)
-    #   return self 
-    # end 
+    if self.is_finalized?
+      ActiveRecord::Base.transaction do
+        self.post_finalize_update( employee, params)
+        return self 
+      end
+    end 
     self.quantity_confirmed        = params[:quantity_confirmed]
     self.quantity_returned         = params[:quantity_returned]
     self.quantity_lost             = params[:quantity_lost]
@@ -275,10 +248,7 @@ class DeliveryEntry < ActiveRecord::Base
     end
     
     return self if  self.errors.size != 0 
-    # puts "Not supposed to be printed out if there is error"
-    if self.save  
-      puts "9888 we saved this thing successfully"
-    end
+    self.save  
     return self  
   end
   
@@ -286,19 +256,10 @@ class DeliveryEntry < ActiveRecord::Base
   def finalize 
     return nil if self.is_confirmed == false 
     return nil if self.is_finalized == true 
-     
-     
-    # puts "BEFORE validate post delivery update" 
-    # puts "quantity_sent : #{self.quantity_sent}"
-    # puts "quantity_confirmed : #{self.quantity_confirmed}"
-    # puts "quantity_returned : #{self.quantity_returned}"
-    # puts "quantity_lost : #{self.quantity_lost} "
-    
+      
     self.validate_post_delivery_update
     
     if  self.errors.size != 0 
-      puts("AAAAAAAAAAAAAAAA THe sibe kia is NOT  valid")
-      
       self.errors.messages.each do |key, values| 
         puts "The key is #{key.to_s}"
         values.each do |value|
@@ -316,7 +277,7 @@ class DeliveryEntry < ActiveRecord::Base
     
     StockMutation.create_delivery_return_stock_mutation( self ) 
     StockMutation.create_delivery_lost_stock_mutation( self ) 
-    StockEntryUsage.update_delivery_finalization_stock_entry_usage( self ) 
+    # StockEntryUsage.update_delivery_finalization_stock_entry_usage( self ) 
   end
   
   def stock_entry_usages

@@ -209,9 +209,9 @@ ActiveRecord::Schema.define(:version => 20130222101859) do
     t.string   "source_document"
     t.integer  "stock_entry_id"
     t.integer  "item_id"
-    t.integer  "case"
-    t.datetime "created_at",               :null => false
-    t.datetime "updated_at",               :null => false
+    t.integer  "case",                     :default => 1
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
   end
 
   create_table "stock_migrations", :force => true do |t|

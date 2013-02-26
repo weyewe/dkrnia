@@ -54,17 +54,7 @@ describe StockAdjustment do
       :item_id => @test_item.id,
       :quantity => @migration_quantity
     })  
-
-    # create stock adjustment 
-    # StockAdjustment.create_item_adjustment(@admin , @test_item , 150 ) 
-
-    # create purchase  + purchase entry 
-
-    # create purchase receive + purchase receive entry 
-    # create delivery  + delivery entry 
-      # delivery case: inspection or call. Nevertheless, put it in the note field 
-
-
+ 
     # that's it for prototype #1
     @test_item.reload 
   end

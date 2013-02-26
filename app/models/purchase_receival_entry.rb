@@ -137,9 +137,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
       return self 
     end
 
-    purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]
-    old_purchase_order_entry = self.purchase_order_entry 
-    
+    purchase_order_entry = PurchaseOrderEntry.find_by_id params[:purchase_order_entry_id]    
     self.purchase_order_entry_id = purchase_order_entry.id 
     self.quantity                = params[:quantity]       
     self.item_id                 = purchase_order_entry.item_id
@@ -171,7 +169,9 @@ class PurchaseReceivalEntry < ActiveRecord::Base
       self.save
       stock_entry.purchase_receival_change_item( self )
       stock_mutation.purchase_receival_change_item( self )  
-    else
+    end
+    
+    if self.quantity != params[:quantity]
       # only changing the quantity 
       self.quantity                = params[:quantity]
       self.save
@@ -224,7 +224,7 @@ class PurchaseReceivalEntry < ActiveRecord::Base
     self.reload 
     
     # create  stock_entry and the associated stock mutation 
-    StockEntry.generate_purchase_receival_stock_entry( self  ) 
+    # StockEntry.generate_purchase_receival_stock_entry( self  ) 
     StockMutation.generate_purchase_receival_stock_mutation( self  ) 
   end
   

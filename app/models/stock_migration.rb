@@ -94,7 +94,7 @@ class StockMigration < ActiveRecord::Base
     # guard.. if there is error, won't go through
     ActiveRecord::Base.transaction do
       if self.save   
-        stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
+        # stock_entry.update_stock_migration_stock_entry( self ) if not stock_entry.nil? 
         stock_mutation.update_stock_migration_stock_mutation( self ) if not stock_mutation.nil? 
       end
     end
@@ -121,7 +121,7 @@ class StockMigration < ActiveRecord::Base
       self.generate_code
       
       # create the Stock Entry  + Stock Mutation =>  Update Ready Item 
-      StockEntry.generate_stock_migration_stock_entry( self  ) 
+      # StockEntry.generate_stock_migration_stock_entry( self  ) 
       StockMutation.generate_stock_migration_stock_mutation(self ) 
       # item = self.item  
       # item.add_stock_and_recalculate_average_cost_post_stock_entry_addition 

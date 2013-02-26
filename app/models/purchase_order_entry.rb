@@ -16,7 +16,7 @@ class PurchaseOrderEntry < ActiveRecord::Base
   validates_presence_of :quantity  
   
    
-  validate :quantity_must_not_less_than_zero 
+  # validate :quantity_must_not_less_than_zero 
   
   after_save :update_item_pending_receival, :update_fulfillment_status
   after_destroy :update_item_pending_receival 
@@ -48,22 +48,22 @@ class PurchaseOrderEntry < ActiveRecord::Base
      
   def delete(employee)
     return nil if employee.nil?
-    if self.is_confirmed?  
-      # do something. if it is linked to payment.. we need to do something
-      # if it is not linked.. no need 
-      self.post_confirm_delete( employee )  
-      return self
-    end
+    # if self.is_confirmed?   
+    #   ActiveRecord::Base.transaction do
+    #     self.post_confirm_delete( employee )  
+    #     return self
+    #   end
+    # end
     
     self.destroy 
   end
   
   def post_confirm_delete( employee)  
     # if there has been receival, can't be destroyed. 
-    if self.purchase_receival_entries.where(:is_deleted => false).count != 0 
-      
-      return self
+    self.purchase_receival_entries.each do |x|
+      x.delete( employee )  
     end
+    
     self.destroy 
   end
   
@@ -88,11 +88,14 @@ class PurchaseOrderEntry < ActiveRecord::Base
   end
   
   def update_by_employee( employee, params ) 
-    if self.is_confirmed? 
-       # later on, put authorization 
-    end
+    # if self.is_confirmed? 
+    #   ActiveRecord::Base.transaction do
+    #     self.post_confirm_update( employee, params) 
+    #     return self  
+    #   end
+    # end
     
-    self.quantity           = params[:quantity]       
+    self.quantity    = params[:quantity]       
     self.item_id     = params[:item_id]
            
     self.save 
@@ -101,8 +104,10 @@ class PurchaseOrderEntry < ActiveRecord::Base
   end
   
   
-  # def post_confirm_update(employee, params)
-  # end
+  def post_confirm_update(employee, params)
+    # if item is changed  
+    # if quantity is changed 
+  end
   
   
   def generate_code

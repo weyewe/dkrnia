@@ -43,45 +43,27 @@ class StockMutation < ActiveRecord::Base
   
   def StockMutation.create_stock_adjustment( employee, stock_adjustment)
     item = stock_adjustment.item 
-    if stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:addition]
-      
-      
     
-      # create the StockMutation
-      StockMutation.create(
-        :quantity            => stock_adjustment.adjustment_quantity  ,
-        :stock_entry_id      =>  new_stock_entry.id ,
-        :creator_id          =>  employee.id ,
-        :source_document_entry_id  =>  stock_adjustment.id   ,
-        :source_document_id  =>  stock_adjustment.id  ,
-        :source_document_entry     =>  stock_adjustment.class.to_s,
-        :source_document    =>  stock_adjustment.class.to_s,
-        :mutation_case      => MUTATION_CASE[:stock_adjustment],
-        :mutation_status => MUTATION_STATUS[:addition],
-        :item_id => item.id
-      ) 
+    new_object = StockMutation.new 
+    
+    new_object.quantity                     = stock_adjustment.adjustment_quantity 
+    new_object.creator_id                   = employee.id
+    new_object.source_document_entry_id     = stock_adjustment.id
+    new_object.source_document_id           = stock_adjustment.id
+    new_object.source_document_entry        = stock_adjustment.class.to_s
+    new_object.source_document              = stock_adjustment.class.to_s
+    new_object.mutation_case                =  MUTATION_CASE[:stock_adjustment]
+    new_object.item_id                      = item.id 
+    
+    
+    
+    
+    if stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:addition]
+      new_object.mutation_status = MUTATION_STATUS[:addition]
     elsif stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:deduction]
-      
-      
-                
-                
-      requested_quantity =  stock_adjustment.adjustment_quantity
-      # and for price deduction? 
-      # over here, we have assumption that for a given stock entry, it is enough to be deducted.
-      # that is not the case though. 
-      # the deduction might come from several stock entries. 
-      StockMutation.deduct_ready_stock(
-              employee, 
-              requested_quantity, 
-              item, 
-              stock_adjustment, 
-              stock_adjustment,
-              MUTATION_CASE[:stock_adjustment], 
-              MUTATION_STATUS[:deduction]  
-            )
-             
-      
+      new_object.mutation_status = MUTATION_STATUS[:deduction]
     end
+    new_object.save 
   end
   
   

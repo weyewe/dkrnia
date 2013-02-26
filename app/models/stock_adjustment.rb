@@ -43,43 +43,43 @@ class StockAdjustment < ActiveRecord::Base
     
     ActiveRecord::Base.transaction do
       ready_quantity = item.ready 
-      new_stock_adjustment = StockAdjustment.new 
+      new_object = StockAdjustment.new 
     
       adjustment_quantity =  physical_quantity  - ready_quantity 
-      new_stock_adjustment.physical_quantity = physical_quantity
-      new_stock_adjustment.ready_quantity = ready_quantity
+      new_object.physical_quantity = physical_quantity
+      new_object.ready_quantity = ready_quantity
       
-      new_stock_adjustment.creator_id = employee.id 
-      new_stock_adjustment.item_id = item.id 
-      new_stock_adjustment.code=  StockAdjustment.generate_adjustment_code( item)
+      new_object.creator_id = employee.id 
+      new_object.item_id = item.id 
+      new_object.code=  StockAdjustment.generate_adjustment_code( item)
       
       physical_to_ready_diff  = physical_quantity  - ready_quantity 
     
       # puts "physical_to_ready_diff : #{physical_to_ready_diff}"
       if physical_to_ready_diff > 0 
-        new_stock_adjustment.adjustment_quantity = physical_to_ready_diff
-        new_stock_adjustment.adjustment_case = STOCK_ADJUSTMENT_CASE[:addition]
+        new_object.adjustment_quantity = physical_to_ready_diff
+        new_object.adjustment_case = STOCK_ADJUSTMENT_CASE[:addition]
         
       elsif physical_to_ready_diff < 0  
-        new_stock_adjustment.adjustment_quantity = physical_to_ready_diff * -1 
-        new_stock_adjustment.adjustment_case = STOCK_ADJUSTMENT_CASE[:deduction] 
+        new_object.adjustment_quantity = physical_to_ready_diff * -1 
+        new_object.adjustment_case = STOCK_ADJUSTMENT_CASE[:deduction] 
       elsif adjustment_quantity == 0  
       end
     
          
-      if new_stock_adjustment.save
-        StockMutation.create_stock_adjustment(employee,  new_stock_adjustment )
+      if new_object.save
+        StockMutation.create_stock_adjustment(employee,  new_object )
         
-        if new_stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:addition]
-          StockEntry.generate_stock_adjustment_stock_entry( new_stock_adjustment )
-        elsif new_stock_adjustment.adjustment_case == STOCK_ADJUSTMENT_CASE[:deduction]
-          StockEntryUsage.generate_stock_adjustment_stock_entry_usage( new_stock_adjustment ) 
-        end
+        # if new_object.adjustment_case == STOCK_ADJUSTMENT_CASE[:addition]
+        #   StockEntry.generate_stock_adjustment_stock_entry( new_object )
+        # elsif new_object.adjustment_case == STOCK_ADJUSTMENT_CASE[:deduction]
+        #   StockEntryUsage.generate_stock_adjustment_stock_entry_usage( new_object ) 
+        # end
         
       end
         
       
-      return new_stock_adjustment
+      return new_object
     end
      
   end

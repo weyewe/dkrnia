@@ -1,10 +1,37 @@
-Things to do:
+Total flow:
+1. Employee
+2. Item Category
+3. Item 
+4. Stock Migration  => Update (always update)   [OK] (code base is ready, pending rspec)
+5. Stock Adjustment  =>  Always create ( no update )   [ok code base is ready]
 
-1. Delivery + Finalization => Deduct price. (dont adjust the CoGS price yet)
-	Make sure that the StockEntryUsage does its shit. What kind of shit?
+6. Purchase Order	
+	=> Update/Delete => post confirm (will only deduct the pending receival) 
+	# on update: if the final pending receival < received item.. fuck it.. error 
+	# on delete: if there is any receival => fuck it.  But then again, this is corner cases.
+	And we assume that it is the admin that is doing the work. We should not be kept responsible. 
+	# anyhow, they can always use the stock adjustment. 
+	Just allow it to happen => always admin responsibility 
 	
-	On delivery confirmation: 
-	1. update the statistic of ready item 
-	2. update the statistic of pending delivery ( if goes through sales order ) 
+	=> Change Item being ordered => no problemo, if there is no receival
+	# update the pending receival status for target item and source item 
+	
+7. Purchase Receival 	=> update/delete => + post confirm 
+	# update : if it causes the ready to be less than 0 => error
+	
+	# the delete , post confirm update is done as well.  :update_fulfillment_status
+	# if it is larger than the quantity specified in purchase order => error 
 
-2. Receipt + Number (should be quick)
+8. Delivery to customer / usage, or whatever.   => update/delete post confirm / post finalize 
+	# 1. change the quantity sent => just do it .. and i won't check the integrity 
+	# 2. change the quantity returned + lost + confirmed => nothing to do with the backend 
+			# will still check the integrity 
+			
+			# DONE ! fuck yeah.. print the delivery receipt  + report 
+
+  
+# use this simple steps => move on to the Ext JS full fledged :) 
+
+
+DO RSPEC for update on purchase order, purchase receival and finally delivery 
+# delivery post finalization => copy the one in supermetal. 

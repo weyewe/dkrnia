@@ -194,19 +194,19 @@ describe Delivery do
       end
       
       
-      it 'should create stock entry usage' do
-        StockEntryUsage.where(
-          :source_document_entry_id => @delivery_entry.id,
-          :source_document_entry => @delivery_entry.class.to_s
-        ).count.should_not == 0 
-      end
+      # it 'should create stock entry usage' do
+      #   StockEntryUsage.where(
+      #     :source_document_entry_id => @delivery_entry.id,
+      #     :source_document_entry => @delivery_entry.class.to_s
+      #   ).count.should_not == 0 
+      # end
       
-      it 'should create several stock entry usages whose sum is equal to the quantity sent' do
-        StockEntryUsage.where(
-          :source_document_entry_id => @delivery_entry.id,
-          :source_document_entry => @delivery_entry.class.to_s
-        ).sum("quantity").should == @delivery_entry.quantity_sent 
-      end
+      # it 'should create several stock entry usages whose sum is equal to the quantity sent' do
+      #   StockEntryUsage.where(
+      #     :source_document_entry_id => @delivery_entry.id,
+      #     :source_document_entry => @delivery_entry.class.to_s
+      #   ).sum("quantity").should == @delivery_entry.quantity_sent 
+      # end
       
    
       
@@ -296,19 +296,19 @@ describe Delivery do
             @delivery_entry.reload
             @delivery.reload
             @test_item.reload
-            @stock_entry_usage = @delivery_entry.stock_entry_usages.first
-            @initial_quantity_used = @stock_entry_usage.quantity
-            @stock_entry = @stock_entry_usage.stock_entry
-            @stock_entry_used_quantity = @stock_entry.used_quantity
-            puts "initial @stock_entry.used_quantity = #{@stock_entry.used_quantity}"
+            # @stock_entry_usage = @delivery_entry.stock_entry_usages.first
+            # @initial_quantity_used = @stock_entry_usage.quantity
+            # @stock_entry = @stock_entry_usage.stock_entry
+            # @stock_entry_used_quantity = @stock_entry.used_quantity
+            # puts "initial @stock_entry.used_quantity = #{@stock_entry.used_quantity}"
             
             @pre_finalization_ready = @test_item.ready 
             @delivery.finalize(@admin)
             @delivery_entry.reload 
             @delivery.reload 
-            @stock_entry_usage.reload 
-            @stock_entry.reload 
-            puts "final @stock_entry.used_quantity = #{@stock_entry.used_quantity}"
+            # @stock_entry_usage.reload 
+            # @stock_entry.reload 
+            # puts "final @stock_entry.used_quantity = #{@stock_entry.used_quantity}"
             @test_item.reload 
           end
           
@@ -344,17 +344,17 @@ describe Delivery do
             @delivery_entry.delivery_lost_stock_mutation.should be_nil 
           end
           
-          it 'should reduce the quantity used in stock_entry_usage' do
-            @final_quantity_used = @stock_entry_usage.quantity
-            diff = @initial_quantity_used - @final_quantity_used 
-            diff.should == @quantity_returned
-          end
+          # it 'should reduce the quantity used in stock_entry_usage' do
+          #   @final_quantity_used = @stock_entry_usage.quantity
+          #   diff = @initial_quantity_used - @final_quantity_used 
+          #   diff.should == @quantity_returned
+          # end
           
-          it 'should reduce the used quantity in the stock entry ' do
-            @final_stock_entry_used_quantity = @stock_entry.used_quantity
-            diff = @stock_entry_used_quantity - @final_stock_entry_used_quantity
-            diff.should == @quantity_returned 
-          end
+          # it 'should reduce the used quantity in the stock entry ' do
+          #   @final_stock_entry_used_quantity = @stock_entry.used_quantity
+          #   diff = @stock_entry_used_quantity - @final_stock_entry_used_quantity
+          #   diff.should == @quantity_returned 
+          # end
         end
         
       end
