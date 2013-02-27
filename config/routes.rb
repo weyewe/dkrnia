@@ -38,6 +38,7 @@ Dikarunia::Application.routes.draw do
   
   match 'search_item'  => 'items#search_item' , :as => :search_item
   match 'search_vendor'  => 'vendors#search_vendor' , :as => :search_vendor
+  match 'search_purchase_order' => 'purchase_orders#search_purchase_order' , :as => :search_purchase_order
   match 'search_purchase_order_entry'  => 'purchase_order_entries#search_purchase_order_entry' , :as => :search_purchase_order_entry
   match 'search_employee' => "employees#search_employee" , :as => :search_employee
   
@@ -94,5 +95,16 @@ Dikarunia::Application.routes.draw do
   match 'edit_post_delivery_delivery_entry/:delivery_entry_id'  => 'delivery_entries#edit_post_delivery_delivery_entry', :as => :edit_post_delivery_delivery_entry , :method => :get
   match 'update_post_delivery_delivery_entry/:delivery_entry_id'  => 'delivery_entries#update_post_delivery_delivery_entry', :as => :update_post_delivery_delivery_entry , :method => :post
   match 'print_delivery/:delivery_id' => 'deliveries#print_delivery' , :as => :print_delivery
+
+##################################################
+##################################################
+######### REPORT
+##################################################
+##################################################
+  match 'generate_purchase_order_details' => 'purchase_orders#generate_details' , :as => :generate_purchase_order_details
+  match 'purchase_order_details' => 'purchase_orders#details' , :as => :purchase_order_details 
+  match 'purchase_receival_details' => 'purchase_receivals#details' , :as => :purchase_receival_details 
+  match 'delivery_details' => 'deliveries#details' , :as => :delivery_details 
+
   
 end

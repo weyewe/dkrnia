@@ -9,9 +9,14 @@ $(document).ready(function(){
 	 
 	
 		<% if not params[:details].nil? and params[:details].to_i == 1  %>
+			console.log("gonna destroy");
+			var $row = $("#parent_entry-<%= @object.id %>");
+			$row.spin(false);
+			
 			<% if @object.persisted? == false or @object.is_deleted %>
 				$.msgbox("Berhasil menghapus purchase order: <%= @object.code %>");
 			<% else %>
+			
 				$.msgbox("Error: <%= @object.errors.messages %>", 
 							{type: "error"});
 			<% end %>
@@ -43,7 +48,8 @@ $(document).ready(function(){
 				$.msgbox("Berhasil menghapus purchase order: <%= @object.code %>");
 				$row.remove(); 
 			<% else %>
-				$.msgbox("Error", 
+				$("#parent_entry-<%= @object.id %>").spin(false);
+				$.msgbox("Error: <%= @object.errors[:generic_errors] %>", 
 							{type: "error"});
 			<% end %>
 			

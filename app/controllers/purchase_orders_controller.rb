@@ -52,7 +52,6 @@ class PurchaseOrdersController < ApplicationController
   DETAILS
 =end
   def details
-    puts "We are in the details of sales order\n"*50
     @object = PurchaseOrder.find_by_id params[:id]
   end
   

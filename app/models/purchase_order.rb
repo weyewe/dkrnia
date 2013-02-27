@@ -15,34 +15,32 @@ class PurchaseOrder < ActiveRecord::Base
   def delete(employee) 
     return nil if employee.nil? 
     if self.is_confirmed? 
-      # ActiveRecord::Base.transaction do
-      #   self.post_confirm_delete( employee) 
-      # end
+      ActiveRecord::Base.transaction do
+        self.post_confirm_delete( employee) 
+      end
       return self
     end
    
     self.destroy
   end
   
-  # def post_confirm_delete( employee) 
-  #   
-  #   # if one of its child is delivered, can't delete 
-  #   # wtf.. just delete.
-  #   
-  #   sales_item_id_list = self.sales_items.map{|x| x.id }
-  #   if DeliveryEntry.where(:sales_item_id => sales_item_id_list).count != 0 
-  #     self.errors.add(:delete_fail , "Sudah ada pengiriman." )  
-  #     return self
-  #   end
-  #   
-  #    
-  #   self.sales_items.each do |si|
-  #     si.delete( employee ) 
-  #   end 
-  #   
-  #   self.is_deleted = true 
-  #   self.save 
-  # end
+  def post_confirm_delete( employee) 
+    
+    purchase_order_entry_id_list = self.purchase_order_entries.map{|x| x.id }
+    if PurchaseReceivalEntry.where(:purchase_order_entry_id => purchase_order_entry_id_list).count != 0 
+      self.errors.add(:generic_errors , "Sudah ada penerimaan." )  
+      return self
+    end
+    
+    
+     
+    self.purchase_order_entries.each do |poe|
+      poe.delete( employee ) 
+    end 
+    
+    self.is_deleted = true 
+    self.save 
+  end
   
    
   

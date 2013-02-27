@@ -9,13 +9,13 @@
 		<div class='row'>
 			<div id="myTabContent" class="tab-content" style='overflow:visible;'>
 				<div class="tab-pane fade active in" id="tab1"> 
-					<%= simple_form_for :sales_order, { url: generate_sales_order_details_url , 
+					<%= simple_form_for :purchase_order, { url: generate_purchase_order_details_url , 
 								:html => {:id=>"details_trigger_form" } } do |f| %>
 					  <%= f.input :search_record_id , :label => "Code"  , :input_html => {
 							:id => 'search_record_id'
 						}%> 
 						<%=	 hidden_field_tag 'selected_record_id', '' %>  
-						<%= hidden_field_tag 'search_url', "#{search_sales_order_url}"  %>
+						<%= hidden_field_tag 'search_url', "#{search_purchase_order_url}"  %>
 					<% end %>
  
 				</div> 
@@ -34,10 +34,10 @@
 				</div>
 			<% else %>
 				<div id="details_wrapper" >
-					<%= render :partial => "sales_orders/details", 
+					<%= render :partial => "purchase_orders/details", 
 						:locals => {
 					    :parent => @object ,
-							:children 		=> @object.sales_items.order("created_at DESC")
+							:children 		=> @object.purchase_order_entries.order("created_at DESC")
 				  } %>
 				</div>
 		 
@@ -83,13 +83,13 @@
 
 
 <div class="hidden" id="delete_entry_form_wrapper">
-  <%= form_for SalesOrder.new, :url =>delete_production_history_url , :method => :post   do |f| %>
+  <%= form_for PurchaseOrder.new, :url =>root_url , :method => :post   do |f| %>
     <%= hidden_field_tag 'object_to_destroy_id' , ''  %> 
   <% end %>
 </div>
 
 <div class="hidden" id="confirm_entry">
-  <%= form_for SalesOrder.new, :url => delete_production_history_url , :method => :post   do |f| %>
+  <%= form_for PurchaseOrder.new, :url => root_url , :method => :post   do |f| %>
   <% end %>
 </div>
 

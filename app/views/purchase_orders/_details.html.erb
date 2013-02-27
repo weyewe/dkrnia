@@ -3,7 +3,7 @@
 		<thead>
 			<tr>
 				<th>Code</th>
-				<th>Customer</th>
+				<th>Vendor</th>
 				<th>Tanggal Order</th>  
 				<th>Status</th>  
 				<th>Total Sales Item</th>  
@@ -17,7 +17,7 @@
 					<%= object.code %>
 				</td>
 				<td>
-					<%= "#{object.customer.name}" %>
+					<%= "#{object.vendor.name}" %>
 				</td>
 
 				<td>
@@ -33,15 +33,15 @@
 				</td>
 
 				<td>
-					<%= object.active_sales_items.count %>
+					<%= object.active_purchase_order_entries.count %>
 				</td>
 
-
-					<td>
-						<%= link_to delete_purchase_order_url(:details => 1), :class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
-							<i class='icon-remove'></i>Delete
-						<% end %> 
-					</td>
+				<td>
+					<%= link_to purchase_order_url(object.id ), :class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
+						<i class='icon-remove'></i>Delete
+					<% end %>
+				</td>
+			 
 
 					<td>
 						<%= link_to edit_purchase_order_url(object, :details => 1 ), 
@@ -58,7 +58,7 @@
 	<hr />
 	
 	
-	<%= render :partial => 'sales_items/purchase_order/item_list', :locals => {
+	<%= render :partial => 'purchase_order_entries/purchase_order/item_list', :locals => {
 		:objects => children, 
 		:parent => parent,
 		:details => 1 
