@@ -310,6 +310,44 @@ class StockMutation < ActiveRecord::Base
     
     new_object.save 
   end
+  
+  
+  def render_mutation_case
+    if self.mutation_case == MUTATION_CASE[:stock_migration] 
+      return "Migrasi"
+    elsif self.mutation_case == MUTATION_CASE[:purchase_receival] 
+      return "Penerimaan"
+    elsif self.mutation_case == MUTATION_CASE[:stock_adjustment]
+      return "Penyesuaian"
+    elsif self.mutation_case == MUTATION_CASE[:delivery] 
+      return "Pengiriman"
+    elsif self.mutation_case == MUTATION_CASE[:delivery_lost] 
+      return "Hilang Pengiriman" 
+    elsif self.mutation_case == MUTATION_CASE[:delivery_returned]   
+      return "Retur Pengiriman"
+    else 
+      return ""
+    end
+  end
+  
+  def render_mutation_status
+    if self.mutation_status == MUTATION_STATUS[:deduction] 
+       "-"
+    elsif self.mutation_status == MUTATION_STATUS[:addition] 
+       "+"
+    end
+  end
+  
+  def document_code
+    class_name  = self.source_document 
+    document_id = self.source_document_id
+    document = eval("#{class_name}.find_by_id(#{document_id})")
+    if not document.code.nil?
+      return document.code 
+    else
+      return class_name 
+    end
+  end
    
   
 end

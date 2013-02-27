@@ -1,4 +1,4 @@
-class PurchaseReceivals < Netzke::Communitypack::LiveSearchGrid
+class PurchaseReceivals < Netzke::Basepack::Grid
   
   
   

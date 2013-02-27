@@ -1,4 +1,4 @@
-class PurchaseOrders < Netzke::Communitypack::LiveSearchGrid
+class PurchaseOrders < Netzke::Basepack::Grid
   
   
   

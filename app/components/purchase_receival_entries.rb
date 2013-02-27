@@ -1,4 +1,4 @@
-class PurchaseOrderEntries < Netzke::Basepack::Grid
+class PurchaseReceivalEntries < Netzke::Basepack::Grid
   
   # how can we not show the add, delete?
   # read only ? in the Netzke::Basepack::Grid
@@ -8,6 +8,7 @@ class PurchaseOrderEntries < Netzke::Basepack::Grid
     super
     c.model = "PurchaseReceivalEntry"
     c.columns = [
+      :purchase_receival__code,
       :item__name,
       :quantity 
     ]

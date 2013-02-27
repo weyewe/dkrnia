@@ -8,6 +8,7 @@ class PurchaseOrderEntries < Netzke::Basepack::Grid
     super
     c.model = "PurchaseOrderEntry"
     c.columns = [
+      :purchase_order__code, 
       :item__name,
       :quantity 
     ]

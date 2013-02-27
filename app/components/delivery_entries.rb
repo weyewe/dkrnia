@@ -8,6 +8,7 @@ class DeliveryEntries < Netzke::Basepack::Grid
     super
     c.model = "DeliveryEntry"
     c.columns = [
+      :delivery__code,
       :item__name,
       :quantity_sent,
       :quantity_confirmed, 

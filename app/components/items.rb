@@ -1,4 +1,4 @@
-class Items < Netzke::Communitypack::LiveSearchGrid
+class Items < Netzke::Basepack::Grid
   
   
   

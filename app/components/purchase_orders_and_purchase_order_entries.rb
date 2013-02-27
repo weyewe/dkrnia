@@ -1,4 +1,4 @@
-class PurchaseOrderAndPurchaseOrderEntries < Netzke::Base
+class PurchaseOrdersAndPurchaseOrderEntries < Netzke::Base
   # Remember regions collapse state and size
   include Netzke::Basepack::ItemPersistence
 

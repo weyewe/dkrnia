@@ -68,13 +68,13 @@ class Application < Netzke::Basepack::Viewport
     c.desc = "Daftar pembelian barang dan sejarah penerimaan"
   end
   
-  component :purchase_receivals_purchase_receival_entries do |c|
+  component :purchase_receivals_and_purchase_receival_entries do |c|
     c.desc = "Daftar Penerimaan Barang Barang"
   end 
   
   component :deliveries_and_delivery_entries do |c|
     c.desc = "Daftar Keluar barang"
-  en
+  end
   
   # Item History 
   
@@ -164,7 +164,7 @@ protected
         { :text => "Keluar Masuk Barang",
            :expanded => true,
            :children => [
-             leaf("Penerimaan Barang", :purchase_receivals_purchase_receival_entries, :user),
+             leaf("Penerimaan Barang", :purchase_receivals_and_purchase_receival_entries, :user),
              leaf("Delivery", :deliveries_and_delivery_entries, :user)
              
            ]
@@ -178,11 +178,7 @@ protected
         }
       ]
     }
-
-    # if current_user
-    #   out[:children] << { text: "Private components", expanded: true, children: [ leaf("For authenticated users", :for_authenticated, :lock) ]}
-    # end
-
+ 
     out
   end
 end
