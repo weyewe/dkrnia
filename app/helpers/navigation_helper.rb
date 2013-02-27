@@ -218,7 +218,7 @@ module NavigationHelper
   }
   
   SALES_NAV = {
-    :header => "Sales",
+    :header => "Keluar Barang",
     :header_icon => "icon-shopping-cart",
     :has_dropdown => true, 
     :only_icon => false , 
@@ -226,37 +226,21 @@ module NavigationHelper
       # block 1 
       [
         {
-          :name => "Customer",
-          :url  => 'new_customer_url',
+          :name => "Surat Jalan",
+          :url  => 'new_delivery_url',
           :icon => "icon-folder-close",
           :activities => [
             {
-              :controller => "customers",
-              :action     => "new"
-            } 
-          ]
-        } 
-      ],
-      
-      # block sales return 
-      [
-        {
-          :name => "Sales Order",
-          :url  => 'new_sales_order_url',
-          :icon => "icon-shopping-cart",
-          :activities => [
-            {
-              :controller => "sales_orders",
+              :controller => "deliveries",
               :action     => "new"
             },
             {
-              :controller => "sales_items",
+              :controller => "delivery_entries",
               :action     => "new"
             }
           ]
         } 
-      ]
-      
+      ] 
     ] 
   }
   
@@ -266,7 +250,8 @@ module NavigationHelper
     navigation_blocks = [] 
     [ 
       MANAGEMENT_NAV,  
-      SUPPLY_NAV
+      SUPPLY_NAV,
+      SALES_NAV
             # INVENTORY_NAV #,
       #       REPORT_NAV, 
       #       PAYMENT_NAV,

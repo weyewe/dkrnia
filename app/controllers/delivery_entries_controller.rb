@@ -2,21 +2,22 @@ class DeliveryEntriesController < ApplicationController
   before_filter :role_required, :except => [:search_delivery_entry]
   def new
     @parent = Delivery.find_by_id params[:delivery_id]
-    @customer = @parent.customer 
+    @employee = @parent.employee 
     @objects = @parent.delivery_entries 
     @new_object = DeliveryEntry.new 
     
     add_breadcrumb "Surat Jalan", 'new_delivery_url'
     set_breadcrumb_for @parent, 'new_delivery_delivery_entry_url' + "(#{@parent.id})", 
-                "Tambah Sales Item ke Surat Jalan"
+                "Tambah  Item ke Surat Jalan"
   end
   
   def create
     # HARD CODE.. just for testing purposes 
     # params[:customer][:town_id] = Town.first.id 
     @parent = Delivery.find_by_id params[:delivery_id]
-    @object = DeliveryEntry.create_delivery_entry( current_user, @parent, params[:delivery_entry] ) 
-    @customer = @parent.customer
+    @object = DeliveryEntry.create_by_employee( current_user, @parent, params[:delivery_entry] ) 
+    # @customer = @parent.customer
+    @employee= @parent.employee
     if @object.errors.size == 0 
       @new_object=  DeliveryEntry.new
     else
@@ -29,18 +30,20 @@ class DeliveryEntriesController < ApplicationController
     # @customer = Customer.find_by_id params[:id] 
     @object = DeliveryEntry.find_by_id params[:id]
     @parent = @object.delivery
-    @customer = @parent.customer 
+    # @customer = @parent.customer 
+    @employee = @parent.employee
   end
   
-  def update_delivery_entry
-    @object = DeliveryEntry.find_by_id params[:delivery_entry_id] 
+  def update
+    @object = DeliveryEntry.find_by_id params[:id] 
     @parent = @object.delivery
-    @object.update_delivery_entry(current_user, @parent,   params[:delivery_entry])
-    @customer = @parent.customer
+    @object.update_by_employee(current_user,  params[:delivery_entry])
+    # @customer = @parent.customer
+    @employee = @parent.employee
     @has_no_errors  = @object.errors.size  == 0
   end
   
-  def delete_delivery_entry
+  def destroy
     @object = DeliveryEntry.find_by_id params[:object_to_destroy_id]
     @object.delete(current_user)
   end
@@ -71,7 +74,8 @@ class DeliveryEntriesController < ApplicationController
     @parent = @object.delivery
     
     @object.update_post_delivery( current_user, params[:delivery_entry] )
-    @customer = @parent.customer
+    # @customer = @parent.customer
+    @employee = @parent.employee
     @has_no_errors  = @object.errors.size  == 0
   end
    
@@ -85,7 +89,6 @@ class DeliveryEntriesController < ApplicationController
   
   def create_special_delivery_entry
     create
-    
   end
   
   def edit_special_delivery_entry

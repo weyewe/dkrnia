@@ -1,43 +1,24 @@
 <% if new_object.persisted? %>
 	<% id = 'edit_object'%>
+	<% rest_method_class = 'rest_put' %>
 <% else %>
 	<% id = 'new_object'%>
+	<% rest_method_class = 'rest_post' %>
 <% end %>
 
 <%= simple_form_for( new_object, :url => url,
       :method => :post , 
-      :html => {:class => " form-horizontal prevent_double_submit ajax-form   no_content_form",
+      :html => {:class => " prevent_double_submit ajax-form  #{rest_method_class}   no_content_form",
         :id => "#{id}"}) do |f| %>
  
    
  
 
-	<%= f.input :sales_item_id, :label => "Sales Item" do %>
-     <%= f.select :sales_item_id, 
-         customer.all_selectable_sales_items %>
-  <% end %>
- 
+	<%= f.input :item_id, :label => "Item"   %>
+	<%= f.input :quantity_sent, :label => "Jumlah Dikirim"  %>
 
-	<%#= f.input :entry_case, :label =>"Kasus Pengiriman"   %>
-	<%= f.input :entry_case, :label => "Kasus Pengiriman" do %>
-     <%= f.select :entry_case, 
-         DeliveryEntry.all_selectable_delivery_entry_cases %>
-  <% end %>
-
-	<%#= f.input :item_condition, :label =>"Kondisi Barang"   %>
-	<%= f.input :item_condition, :label => "Kondisi Barang" do %>
-     <%= f.select :item_condition, 
-         DeliveryEntry.all_selectable_delivery_entry_item_conditions %>
-  <% end %>
- 
-	
-	<hr />
-		<%= f.input :quantity_sent, :label =>"Kuantitas"   %>
-		<%= f.input :quantity_sent_weight, :label =>"Berat Total", 
-				:hint => "Dalam kilogram, sensitif sampai 2 decimal. Contoh: <b>2.15</b>kg"   %>
 	 
- 
-		
+  
 	
 	
 
@@ -51,6 +32,22 @@
 		
   </div>
 <% end %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	 $("#delivery_entry_item_id").tokenInput('<%=	search_item_url %>', {
+		prePopulate:   	[
+				<% if not new_object.item_id.nil? %> 
+				{id: <%= new_object.item_id %>, name: '<%= new_object.item.name %>'}
+				<% end %>
+			],
+		zindex: 9999,
+		propertyToSearch: "name",
+		tokenLimit: 1
+	});
+});
+</script>
 
 
  

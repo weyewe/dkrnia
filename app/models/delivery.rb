@@ -5,8 +5,7 @@ class Delivery < ActiveRecord::Base
   validates_presence_of :employee_id 
     
   has_many :delivery_entries 
-  
-  # belongs_to :vendor 
+  belongs_to :employee 
   
    
    
@@ -28,14 +27,13 @@ class Delivery < ActiveRecord::Base
   
   def post_confirm_delete( employee) 
      
-    sales_item_id_list = self.sales_items.map{|x| x.id }
-    if DeliveryEntry.where(:sales_item_id => sales_item_id_list).count != 0 
-      self.errors.add(:delete_fail , "Sudah ada pengiriman." )  
+    if self.delivery_entries.count != 0 
+      self.errors.add(:generic_error , "Sudah ada pengiriman." )  
       return self
     end
     
      
-    self.sales_items.each do |si|
+    self.delivery_entries.each do |si|
       si.delete( employee ) 
     end 
     
@@ -169,6 +167,10 @@ class Delivery < ActiveRecord::Base
 =begin
   Sales Invoice Printing
 =end
+  def printed_code
+    self.code.gsub('/','-')
+  end
+
   def printed_sales_invoice_code
     self.code.gsub('/','-')
   end

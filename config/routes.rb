@@ -1,6 +1,7 @@
 Dikarunia::Application.routes.draw do
   devise_for :users
   root :to => 'home#index'
+  netzke
   
   devise_scope :user do
     get "sign_in", :to => "devise/sessions#new"
@@ -37,8 +38,8 @@ Dikarunia::Application.routes.draw do
   
   match 'search_item'  => 'items#search_item' , :as => :search_item
   match 'search_vendor'  => 'vendors#search_vendor' , :as => :search_vendor
-  
   match 'search_purchase_order_entry'  => 'purchase_order_entries#search_purchase_order_entry' , :as => :search_purchase_order_entry
+  match 'search_employee' => "employees#search_employee" , :as => :search_employee
   
   resources :stock_migrations
   match 'generate_stock_migration'  => 'stock_migrations#generate_stock_migration' , :as => :generate_stock_migration, :method => :post 
@@ -50,6 +51,7 @@ Dikarunia::Application.routes.draw do
   resources :deliveries do
     resources :delivery_entries 
   end
+  resources :delivery_entries 
   
 
 =begin
@@ -80,5 +82,17 @@ Dikarunia::Application.routes.draw do
 ######### PURCHASE_RECEIVAL
 ##################################################
 ################################################## 
-  match 'confirm_purchase_receival/:purchase_receival_id' => "purchase_receivals#confirm_purchase_receival", :as => :confirm_purchase_receival, :method => :post 
+  match 'confirm_purchase_receival/:purchase_receival_id' => "purchase_receivals#confirm_purchase_receival", :as => :confirm_purchase_receival, :method => :post
+  
+##################################################
+##################################################
+######### DELIVERY
+##################################################
+##################################################  
+  match 'confirm_delivery/:delivery_id' => "deliveries#confirm_delivery", :as => :confirm_delivery, :method => :post
+  match 'finalize_delivery/:delivery_id' => "deliveries#finalize_delivery", :as => :finalize_delivery, :method => :post 
+  match 'edit_post_delivery_delivery_entry/:delivery_entry_id'  => 'delivery_entries#edit_post_delivery_delivery_entry', :as => :edit_post_delivery_delivery_entry , :method => :get
+  match 'update_post_delivery_delivery_entry/:delivery_entry_id'  => 'delivery_entries#update_post_delivery_delivery_entry', :as => :update_post_delivery_delivery_entry , :method => :post
+  match 'print_delivery/:delivery_id' => 'deliveries#print_delivery' , :as => :print_delivery
+  
 end

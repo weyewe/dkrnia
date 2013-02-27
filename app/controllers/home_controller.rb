@@ -7,4 +7,8 @@ class HomeController < ApplicationController
   
   end
    
+   
+  def report
+    render(:layout => "layouts/report")
+  end
 end

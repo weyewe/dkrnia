@@ -26,13 +26,13 @@ class DeliveriesController < ApplicationController
     @object = Delivery.find_by_id params[:id]
   end
   
-  def update_delivery
-    @object = Delivery.find_by_id params[:delivery_id] 
+  def update
+    @object = Delivery.find_by_id params[:id] 
     @object.update_by_employee( current_user, params[:delivery])
     @has_no_errors  = @object.errors.size  == 0
   end
   
-  def delete_delivery
+  def destroy 
     @object = Delivery.find_by_id params[:object_to_destroy_id]
     @object_identifier = @object.code 
     @object.delete(current_user) 

@@ -20,7 +20,7 @@ $(document).ready(function(){
 
 			
 
-			$.msgbox("Berhasil update post delivery entry untuk item: <%= @object.sales_item.code %>", 
+			$.msgbox("Berhasil update post delivery entry untuk item: <%= @object.item.name %>", 
 						{type: "info"});
 
 			
@@ -71,7 +71,7 @@ $(document).ready(function(){
 			//replace the form, show the edit
 			$form.replaceWith("<%= new_form %>"); 
 
-			$.msgbox("Error dalam update post delivery entry untuk item: <%= @object.sales_item.code %>", 
+			$.msgbox("Error dalam update post delivery entry untuk item: <%= @object.item.name %>", 
 						{type: "error"});
 		<% end %>
 

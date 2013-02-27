@@ -80,19 +80,19 @@
 
 
 <div class="hidden" id="delete_entry_form_wrapper">
-  <%= form_for SalesOrder.new, :url =>delete_delivery_entry_url , :method => :post   do |f| %>
+  <%= form_for Delivery.new, :url =>root_url , :method => :post   do |f| %>
     <%= hidden_field_tag 'object_to_destroy_id' , ''  %> 
   <% end %>
 </div>
 
 <div class="hidden" id="confirm_order">
-  <%= form_for SalesEntry.new, :url => confirm_delivery_url(@parent)  do |f| %> 
+  <%= form_for Delivery.new, :url => confirm_delivery_url(@parent)  do |f| %> 
   <% end %>
 </div>
 
 
 <div class="hidden" id="finalize_order">
-  <%= form_for SalesEntry.new, :url => finalize_delivery_url(@parent)  do |f| %> 
+  <%= form_for Delivery.new, :url => finalize_delivery_url(@parent)  do |f| %> 
   <% end %>
 </div>
 

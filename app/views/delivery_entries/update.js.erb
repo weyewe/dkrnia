@@ -17,7 +17,7 @@ $(document).ready(function(){
 		<% if   @has_no_errors  %> 
 			// clean the add product form
 			$form.remove(); 
-			$.msgbox("Berhasil update delivery entry untuk item: <%= @object.sales_item.code %>", 
+			$.msgbox("Berhasil update delivery entry untuk item: <%= @object.item.name %>", 
 						{type: "info"});
 
 			
@@ -65,14 +65,14 @@ $(document).ready(function(){
 		
 			<% new_form = escape_javascript(  render :partial => "delivery_entries/new_object_form", :locals => {
 		    :new_object => @object , 
-				:url => update_delivery_entry_url(@object, :details => params[:details]),
+				:url => delivery_entry_url(@object, :details => params[:details]),
 				:customer => @customer  
 		  })%>
 		
 			//replace the form, show the edit
 			$form.replaceWith("<%= new_form %>"); 
 
-			$.msgbox("Error dalam update delivery entry untuk item: <%= @object.sales_item.code %>", 
+			$.msgbox("Error dalam update delivery entry untuk item: <%= @object.item.name %>", 
 						{type: "error"});
 		<% end %>
 

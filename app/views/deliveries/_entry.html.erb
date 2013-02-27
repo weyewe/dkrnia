@@ -4,7 +4,7 @@
 		<%= link_to "#{object.code}" , new_delivery_delivery_entry_url( object)%>
 	</td>
 	<td>
-		<%= "#{object.customer.name}" %>
+		<%= "#{object.employee.name}" %>
 	</td>
 	
 	<td>
@@ -26,10 +26,12 @@
 	
 	<% if not object.is_confirmed? %>
 		<td>
-			<%= link_to delete_delivery_url, :class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
+			<%= link_to delivery_url(object.id ), :class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
 				<i class='icon-remove'></i>Delete
-			<% end %> 
+			<% end %>
 		</td>
+	
+	 
 
 		<td>
 			<%= link_to edit_delivery_url(object), 

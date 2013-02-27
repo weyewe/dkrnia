@@ -7,37 +7,12 @@
 		<%= object.code %>
 	</td>
 	<td>
-		<%= object.sales_item.code %> <br />
-		<%= object.sales_item.name %> <br />
-		
-		Jenis Pengiriman:
-		<% if object.entry_case == DELIVERY_ENTRY_CASE[:normal] %>
-			[normal]
-		<% elsif object.entry_case == DELIVERY_ENTRY_CASE[:premature] %>
-			[premature]
-		<% elsif object.entry_case == DELIVERY_ENTRY_CASE[:guarantee_return] %>
-      [Hasil Retur Garansi]
-    <% elsif object.entry_case == DELIVERY_ENTRY_CASE[:bad_source_fail_post_production] %>
-      [Casting Keropos]
-    <% elsif object.entry_case == DELIVERY_ENTRY_CASE[:technical_failure_post_production] %> 
-      [Gagal Bubut]
-    <% end %>
-		<br />
-		
-		Kondisi barang: 
-		<% if object.item_condition == DELIVERY_ENTRY_ITEM_CONDITION[:production] %>
-			[Hasil Cor]
-		<% elsif object.item_condition == DELIVERY_ENTRY_ITEM_CONDITION[:post_production] %>
-			[Hasil Bubut]
-    <% end %>
-		<br />
+		<%= object.item.supplier_code %> <br />
+		<%= object.item.name %> <br />
 	</td>
 	
 	<td>
-		
-		Kuantitas: <b><%= object.quantity_sent %></b> <br />
-		Berat		: <b><%= object.quantity_sent_weight.to_s %></b> kg
-		
+		<%= object.quantity_sent %>
 		<hr />
 		<%= link_to edit_delivery_delivery_entry_url(parent, object,:details => details) , 
 			:class =>"edit_entry modal-toggler", :style => "cursor:pointer; text-decoration:none;" do %>
@@ -51,7 +26,6 @@
 		<hr />
 		
 		Retur:	<b><%= object.quantity_returned %></b><br />
-		Berat: <b><%= object.quantity_returned_weight %></b>
 		<hr />
 		Hilang: 	<b><%= object.quantity_lost %></b>
 		
@@ -63,12 +37,14 @@
 	</td>
 	 
   
+
 	<td>
-		<%= link_to delete_delivery_entry_url(:details => details), :class =>"delete_entry", 
-			:style => "cursor:pointer; text-decoration:none;" do %>
+		<%= link_to delivery_entry_url(object.id ), :class =>"delete_entry", :style => "cursor:pointer; text-decoration:none;" do %>
 			<i class='icon-remove'></i>Delete
-		<% end %> 
+		<% end %>
 	</td>
+	
+	 
 	 
 	
 </tr>

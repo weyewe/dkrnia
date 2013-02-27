@@ -26,16 +26,7 @@
 			</td>
 		<% end %>
 			
-			
-		<% if parent.is_confirmed? and parent.is_finalized? and not parent.sales_return.nil? %>	
-			<td style='text-align: center;'>  
-				<%= link_to confirm_delivery_url(parent),
-					:id => 'confirm' , 
-					:class => " btn btn-primary" do %>
-					<i class="icon-refresh"></i> Sales Return
-				<% end %>
-			</td>
-		<% end %>
+ 
 		</tr>
 	</tbody>
 </table>
