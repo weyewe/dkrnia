@@ -6,7 +6,7 @@ class UserMailer < ActionMailer::Base
     @user = user 
     
     mail( :to  => user.email, 
-    :subject => "supermetal | New User" ,
+    :subject => "dikarunia | New User" ,
      :bcc => ["rajakuraemas@gmail.com"],
      :css => [:bootstrap_email] )
   end
@@ -18,7 +18,7 @@ class UserMailer < ActionMailer::Base
 
     
     mail( :to  => user.email, 
-    :subject => "supermetal | Reset Password" ,
+    :subject => "dikarunia | Reset Password" ,
      :bcc => ["w.yunnal@gmail.com"],
      :css => [:bootstrap ] )
   end
